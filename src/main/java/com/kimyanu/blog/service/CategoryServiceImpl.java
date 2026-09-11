@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service
@@ -20,13 +21,25 @@ public class CategoryServiceImpl implements CategoryService{
 
     @Override
     public void createCategory(Category category) {
+
+        boolean duplicate = categories.stream()
+                        .anyMatch(c -> c.getName().equals(category.getName()));
+        if (duplicate) {
+            // 객체가 요청을 수행하기에 적절하지 않은 상태일 때 발생하는 예외
+            throw new IllegalStateException("이미 존재하는 카테고리입니다: " + category.getName());
+        }
+
         category.setId(categoryIdx.incrementAndGet());
         categories.add(category);
     }
 
     @Override
     public void deleteCategory(Long categoryId) {
-        categories.removeIf(category -> category.getId().equals(categoryId));
+        boolean removed = categories.removeIf(category -> category.getId().equals(categoryId));
+
+        if(!removed) {
+            throw new NoSuchElementException("존재하지 않는 카테고리입니다: " + categoryId);
+        }
     }
 
 }
