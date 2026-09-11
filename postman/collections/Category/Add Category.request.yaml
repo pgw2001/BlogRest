@@ -1,8 +1,0 @@
-$kind: http-request
-description: 카테고리 한 개 등록하기
-url: "{{base_url}}/admin/categories"
-method: POST
-body:
-  type: json
-  content: "{\r\n    \"name\": \"게임\"\r\n}"
-order: 4498966996359181
