@@ -1,10 +1,7 @@
 package com.kimyanu.blog.controller;
 
 import com.kimyanu.blog.model.Category;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,21 +12,18 @@ public class CategoryController {
 
     private final List<Category> categories = new ArrayList<>();
 
-    public CategoryController() {
-        categories.add(new Category(1L, "일상"));
-        categories.add(new Category(2L, "개발"));
-        categories.add(new Category(3L, "게임"));
-    }
+    public CategoryController() {}
 
     @GetMapping("/public/categories")
     public List<Category> getCategories() {
         return categories;
     }
 
+    // @RequestBody : 클라이언트가 전송한 JSON 데이터를 자바 객체로 변환하여 매개변수에 바인딩함
     @PostMapping("/admin/categories")
-    public Category createCategory(Category category) {
+    public String createCategory(@RequestBody Category category) {
         categories.add(category);
-        return category;
+        return "Category created successfully!";
     }
 
 
