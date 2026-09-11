@@ -44,14 +44,17 @@ public class CategoryController {
         }
     }
 
-//    @PutMapping("/admin/categories/{categoryId}")
-//    public ResponseEntity<String> updateCategory(@PathVariable Long categoryId) {
-//        try {
-//
-//        } catch() {
-//
-//        }
-//    }
+    @PutMapping("/admin/categories/{categoryId}")
+    public ResponseEntity<String> updateCategory(@PathVariable Long categoryId, @RequestBody Category updatedCategory) {
+        try {
+            categoryService.updateCategory(categoryId, updatedCategory);
+            return ResponseEntity.ok().build();
+        } catch(NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch(IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
+    }
 
 
 }

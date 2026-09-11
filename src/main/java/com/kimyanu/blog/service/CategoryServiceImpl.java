@@ -42,4 +42,24 @@ public class CategoryServiceImpl implements CategoryService{
         }
     }
 
+    @Override
+    public void updateCategory(Long categoryId, Category updatedCategory) {
+        Category existingCategory = categories.stream()
+                .filter(c -> c.getId().equals(categoryId))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 카테고리입니다: " + categoryId));
+
+        boolean duplicate = categories.stream()
+                .anyMatch(c -> !c.getId().equals(categoryId) && c.getName().equals(updatedCategory.getName()));
+
+        if (duplicate) {
+            throw new IllegalStateException("이미 존재하는 카테고리입니다: " + updatedCategory.getName());
+        }
+
+        existingCategory.setName(updatedCategory.getName());
+
+
+
+    }
+
 }
