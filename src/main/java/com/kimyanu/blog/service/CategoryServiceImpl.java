@@ -24,4 +24,9 @@ public class CategoryServiceImpl implements CategoryService{
         categories.add(category);
     }
 
+    @Override
+    public void deleteCategory(Long categoryId) {
+        categories.removeIf(category -> category.getId().equals(categoryId));
+    }
+
 }

@@ -1,0 +1,5 @@
+$kind: http-request
+description: 모든 카테고리 조회하기
+url: "{{base_url}}/public/categories"
+method: GET
+order: 1789086243703
