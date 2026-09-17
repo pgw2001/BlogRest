@@ -79,7 +79,7 @@ public class CategoryServiceImpl implements CategoryService{
 //       // 이미 존재하는 카테고리 이름으로 변경하지 못하는 예외처리
 //        boolean nameChanged = !existCategory.getName().equals(category.getName());
 //        boolean duplicate = categoryRepository.existsByName(category.getName());
-//        if(duplicate) {
+//        if(duplicate && nameChanged) {
 //            throw new IllegalStateException("이미 존재하는 카테고리입니다: " + category.getName());
 //        }
         boolean duplicate = categoryRepository.existsByNameAndIdNot(category.getName(), categoryId);
