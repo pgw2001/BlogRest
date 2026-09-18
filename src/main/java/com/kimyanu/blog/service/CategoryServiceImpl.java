@@ -51,6 +51,10 @@ public class CategoryServiceImpl implements CategoryService{
         if(duplicate) {
             throw new IllegalStateException("이미 존재하는 카테고리입니다: " + category.getName());
         }
+
+        if(category.getName().trim().isBlank()) {
+            throw new IllegalStateException("카테고리 이름은 필수입니다.");
+        }
         categoryRepository.save(category);
     }
 
