@@ -6,6 +6,7 @@ import com.kimyanu.blog.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 // 조회방식 + 조건 + 필드
 // findAll()
@@ -24,8 +25,14 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public Map<String, Object> getAllCategories() {
+        List<Category> categories =  categoryRepository.findAll();
+
+        List<Category> content = categories.stream()
+                .map(category -> new Category(category.getId(), category.getName()))
+                .toList();
+
+        return Map.of("content", content);
     }
 
     @Override

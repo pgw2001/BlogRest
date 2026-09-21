@@ -2,11 +2,11 @@ package com.kimyanu.blog.service;
 
 import com.kimyanu.blog.model.Category;
 
-import java.util.List;
+import java.util.Map;
 
 public interface CategoryService {
 
-    List<Category> getAllCategories();
+    Map<String, Object> getAllCategories();
 
     void createCategory(Category category);
 
