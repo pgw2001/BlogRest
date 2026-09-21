@@ -1,12 +1,14 @@
 package com.kimyanu.blog.service;
 
+import com.kimyanu.blog.dto.CategoryDto;
+import com.kimyanu.blog.dto.CategoryRequest;
+import com.kimyanu.blog.dto.CategoryResponse;
 import com.kimyanu.blog.exceptions.CategoryNotFoundException;
 import com.kimyanu.blog.model.Category;
 import com.kimyanu.blog.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 // 조회방식 + 조건 + 필드
 // findAll()
@@ -25,44 +27,30 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public Map<String, Object> getAllCategories() {
+    public CategoryResponse getAllCategories() {
         List<Category> categories =  categoryRepository.findAll();
 
-        List<Category> content = categories.stream()
-                .map(category -> new Category(category.getId(), category.getName()))
-                .toList();
+        // 엔티티를 DTO로 변환하여 반환 (Entity -> DTO)
+        CategoryResponse categoryResponse = new CategoryResponse();
+        categoryResponse.setContent(categories.stream()
+                .map(category -> new CategoryDto(category.getId(), category.getName()))
+                .toList());
 
-        return Map.of("content", content);
+        return categoryResponse;
     }
 
     @Override
-    public void createCategory(Category category) {
-        // 첫 번째 방법
-//        List<Category> categories = getAllCategories();
-//        boolean duplicate = categories.stream()
-//                .anyMatch(c -> c.getName().equals(category.getName()));
-//        if (duplicate) {
-//            throw new IllegalStateException("이미 존재하는 카테고리입니다: " + category.getName());
-//        }
-
-        // 두 번째 방법
-        // SELECT * FROM category WHERE  name = 'category.getName()'
-//        Optional<Category> existCategory = categoryRepository.findByName(category.getName());
-//        if(existCategory.isPresent()) {
-//            throw new IllegalStateException("이미 존재하는 카테고리입니다: " + category.getName());
-//        }
-
-        // 세 번째 방법 (성능적으로 가장 좋음)
-        boolean duplicate = categoryRepository.existsByName(category.getName());
+    public void createCategory(CategoryRequest categoryRequest) {
+        boolean duplicate = categoryRepository.existsByName(categoryRequest.getName());
 
         if(duplicate) {
-            throw new IllegalStateException("이미 존재하는 카테고리입니다: " + category.getName());
+            throw new IllegalStateException("이미 존재하는 카테고리입니다: " + categoryRequest.getName());
         }
 
-//        if(category.getName().trim().isBlank()) {
-//            throw new IllegalStateException("카테고리 이름은 필수입니다.");
-//        }
-        categoryRepository.save(category);
+        // Request DTO를 엔티티로 변환하고 저장
+        Category categoryEntity = new Category();
+        categoryEntity.setName(categoryRequest.getName());
+        categoryRepository.save(categoryEntity);
     }
 
     @Override
@@ -81,25 +69,26 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public void updateCategory(Long categoryId, Category category) {
+    public void updateCategory(Long categoryId, CategoryRequest categoryRequest) {
 
        Category existCategory = categoryRepository
                 .findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
-//       // 이미 존재하는 카테고리 이름으로 변경하지 못하는 예외처리
-//        boolean nameChanged = !existCategory.getName().equals(category.getName());
-//        boolean duplicate = categoryRepository.existsByName(category.getName());
-//        if(duplicate && nameChanged) {
-//            throw new IllegalStateException("이미 존재하는 카테고리입니다: " + category.getName());
-//        }
-        boolean duplicate = categoryRepository.existsByNameAndIdNot(category.getName(), categoryId);
+        boolean duplicate = categoryRepository.existsByNameAndIdNot(categoryRequest.getName(), categoryId);
+
+        /*
+        boolean nameChanged = !existCategory.getName().equals(categoryRequest.getName());
+        if (nameChanged && duplicate) {
+            throw new IllegalStateException("이미 존재하는 카테고리입니다: " + categoryRequest.getName());
+        }
+         */
 
         if(duplicate) {
-            throw new IllegalStateException("이미 존재하는 카테고리입니다: " + category.getName());
+            throw new IllegalStateException("이미 존재하는 카테고리입니다: " + categoryRequest.getName());
         }
 
-        existCategory.setName(category.getName());
+        existCategory.setName(categoryRequest.getName());
         categoryRepository.save(existCategory);
 
     }

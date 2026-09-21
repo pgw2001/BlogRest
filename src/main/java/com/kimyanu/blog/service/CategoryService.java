@@ -1,16 +1,15 @@
 package com.kimyanu.blog.service;
 
-import com.kimyanu.blog.model.Category;
-
-import java.util.Map;
+import com.kimyanu.blog.dto.CategoryRequest;
+import com.kimyanu.blog.dto.CategoryResponse;
 
 public interface CategoryService {
 
-    Map<String, Object> getAllCategories();
+    CategoryResponse getAllCategories();
 
-    void createCategory(Category category);
+    void createCategory(CategoryRequest categoryRequest);
 
     void deleteCategory(Long categoryId);
 
-    void updateCategory(Long id, Category category);
+    void updateCategory(Long id, CategoryRequest categoryRequest);
 }

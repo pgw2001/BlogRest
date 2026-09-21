@@ -1,5 +1,6 @@
 package com.kimyanu.blog.exceptions;
 
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,11 @@ public class GlobalExecutionHandler {
     @ExceptionHandler(CategoryNotFoundException.class)
     public ResponseEntity<Map<String, List<String>>> handleCategoryNotFoundException(CategoryNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("errors",List.of(e.getMessage())));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String, List<String>>> handleConstraintViolationException(ConstraintViolationException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("errors",List.of("데이터를 저장하는 과정에서 오류가 발생하였습니다. (hibernate)")));
     }
 }
 
