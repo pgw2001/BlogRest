@@ -1,11 +1,11 @@
 package com.kimyanu.blog.service;
 
+import com.kimyanu.blog.exceptions.CategoryNotFoundException;
 import com.kimyanu.blog.model.Category;
 import com.kimyanu.blog.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 // 조회방식 + 조건 + 필드
 // findAll()
@@ -67,7 +67,7 @@ public class CategoryServiceImpl implements CategoryService{
         // findById + 예외 + delete() : 존재 여부를 확인하고, 존재하지 않으면 예외 처리까지 하면서 삭제할 때.
         Category category = categoryRepository
                 .findById(categoryId)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 카테고리입니다: " + categoryId));
+                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
         categoryRepository.delete(category);
         // categoryRepository.deleteById(category);
@@ -78,7 +78,7 @@ public class CategoryServiceImpl implements CategoryService{
 
        Category existCategory = categoryRepository
                 .findById(categoryId)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 카테고리입니다: " + categoryId));
+                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
 //       // 이미 존재하는 카테고리 이름으로 변경하지 못하는 예외처리
 //        boolean nameChanged = !existCategory.getName().equals(category.getName());

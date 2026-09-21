@@ -31,6 +31,11 @@ public class GlobalExecutionHandler {
     public ResponseEntity<Map<String, List<String>>> handleNoSuchElementException(NoSuchElementException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("errors",List.of(e.getMessage())));
     }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<Map<String, List<String>>> handleCategoryNotFoundException(CategoryNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("errors",List.of(e.getMessage())));
+    }
 }
 
 
