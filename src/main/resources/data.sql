@@ -32,3 +32,5 @@ INSERT INTO category (id, name) VALUES (27, '영화리뷰');
 INSERT INTO category (id, name) VALUES (28, '게임');
 INSERT INTO category (id, name) VALUES (29, '질문답변');
 INSERT INTO category (id, name) VALUES (30, '공지사항');
+
+ALTER TABLE category ALTER COLUMN id RESTART WITH 31;
