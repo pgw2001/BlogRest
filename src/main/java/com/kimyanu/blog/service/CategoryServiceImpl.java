@@ -6,6 +6,9 @@ import com.kimyanu.blog.exceptions.CategoryNotFoundException;
 import com.kimyanu.blog.mapper.CategoryMapper;
 import com.kimyanu.blog.model.Category;
 import com.kimyanu.blog.repository.CategoryRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,8 +32,20 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public CategoryResponse getAllCategories() {
-        List<Category> categories =  categoryRepository.findAll();
+    public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize) {
+
+        // Pageable 클래스
+        // 스프링 데이터 JPA에서 제공되는 인터페이스로, 페이징과 정렬 정보를 객체화하여 다루기 위해 제공되는 인터페이스다.
+        Pageable pageDetails = PageRequest.of(pageNumber- 1, pageSize);
+
+        // Page<?> 인터페이스
+        // 스프링 데이터 JPA에서 제공하는 인터페이스로, 페이징 처리된 결과를 담는 객체다.
+        // 일반적인 List<?>와 달리, 페이지 정보(총 페이지 수, 현재 페이지 번호, 페이지 크기 등)와 함께 결과 데이터를 제공한다.
+        Page<Category> categoryPage = categoryRepository.findAll(pageDetails);
+
+        // Page<?> 인터페이스와 getContent() 메서드
+        // Page<?> 인터페이스에서 제공하는 메서드로, 페이징 처리된 결과 데이터만을 List<?> 형태로 반환한다.
+        List<Category> categories =  categoryPage.getContent();
 
         // 엔티티를 DTO로 변환하여 반환 (Entity -> DTO)
         return new CategoryResponse(categoryMapper.toResponseList(categories));

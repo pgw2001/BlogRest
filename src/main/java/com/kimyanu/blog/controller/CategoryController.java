@@ -19,8 +19,12 @@ public class CategoryController {
     }
 
     @GetMapping("/public/categories")
-    public CategoryResponse getCategories() {
-        return categoryService.getAllCategories();
+    public CategoryResponse getCategories(
+            @RequestParam(value = "pageNumber", defaultValue = "1") Integer pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
+    ) {
+        System.out.println(pageNumber + ", "  + pageSize);
+        return categoryService.getAllCategories(pageNumber, pageSize);
     }
 
     @PostMapping("/admin/categories")

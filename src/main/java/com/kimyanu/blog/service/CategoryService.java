@@ -5,7 +5,7 @@ import com.kimyanu.blog.dto.CategoryResponse;
 
 public interface CategoryService {
 
-    CategoryResponse getAllCategories();
+    CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize);
 
     void createCategory(CategoryRequest categoryRequest);
 
