@@ -1,5 +1,6 @@
 package com.kimyanu.blog.controller;
 
+import com.kimyanu.blog.config.AppConstant;
 import com.kimyanu.blog.dto.CategoryRequest;
 import com.kimyanu.blog.dto.CategoryResponse;
 import com.kimyanu.blog.service.CategoryService;
@@ -20,11 +21,13 @@ public class CategoryController {
 
     @GetMapping("/public/categories")
     public CategoryResponse getCategories(
-            @RequestParam(value = "pageNumber", defaultValue = "1") Integer pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
+            @RequestParam(value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstant.SORT_CATEGORY_BY) String sortBy,
+            @RequestParam(value = "sortOrder", defaultValue = AppConstant.SORT_CATEGORY_ASC) String sortOrder
     ) {
-        System.out.println(pageNumber + ", "  + pageSize);
-        return categoryService.getAllCategories(pageNumber, pageSize);
+        System.out.println(sortBy + ", "  + sortOrder);
+        return categoryService.getAllCategories(pageNumber, pageSize, sortBy, sortOrder);
     }
 
     @PostMapping("/admin/categories")

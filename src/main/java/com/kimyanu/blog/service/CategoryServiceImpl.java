@@ -9,6 +9,7 @@ import com.kimyanu.blog.repository.CategoryRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,11 +33,20 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize) {
+    public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+
+        // Sort 객체
+        // 스프링 데이터 JPA에서 제공하는 객체로, 정렬 기준과 방향을 설정할 수 있다.
+        Sort sort = Sort.by(
+                sortOrder.equalsIgnoreCase("asc")
+                        ? Sort.Direction.ASC
+                        : Sort.Direction.DESC,
+                sortBy
+        );
 
         // Pageable 클래스
         // 스프링 데이터 JPA에서 제공되는 인터페이스로, 페이징과 정렬 정보를 객체화하여 다루기 위해 제공되는 인터페이스다.
-        Pageable pageDetails = PageRequest.of(pageNumber- 1, pageSize);
+        Pageable pageDetails = PageRequest.of(pageNumber - 1, pageSize, sort);
 
         // Page<?> 인터페이스
         // 스프링 데이터 JPA에서 제공하는 인터페이스로, 페이징 처리된 결과를 담는 객체다.
