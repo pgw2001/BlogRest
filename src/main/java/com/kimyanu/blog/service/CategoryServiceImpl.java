@@ -1,9 +1,9 @@
 package com.kimyanu.blog.service;
 
-import com.kimyanu.blog.dto.CategoryDto;
 import com.kimyanu.blog.dto.CategoryRequest;
 import com.kimyanu.blog.dto.CategoryResponse;
 import com.kimyanu.blog.exceptions.CategoryNotFoundException;
+import com.kimyanu.blog.mapper.CategoryMapper;
 import com.kimyanu.blog.model.Category;
 import com.kimyanu.blog.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -21,9 +21,11 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService{
 
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
+        this.categoryMapper = categoryMapper;
     }
 
     @Override
@@ -31,12 +33,7 @@ public class CategoryServiceImpl implements CategoryService{
         List<Category> categories =  categoryRepository.findAll();
 
         // 엔티티를 DTO로 변환하여 반환 (Entity -> DTO)
-        CategoryResponse categoryResponse = new CategoryResponse();
-        categoryResponse.setContent(categories.stream()
-                .map(category -> new CategoryDto(category.getId(), category.getName()))
-                .toList());
-
-        return categoryResponse;
+        return new CategoryResponse(categoryMapper.toResponseList(categories));
     }
 
     @Override
@@ -47,9 +44,8 @@ public class CategoryServiceImpl implements CategoryService{
             throw new IllegalStateException("이미 존재하는 카테고리입니다: " + categoryRequest.getName());
         }
 
-        // Request DTO를 엔티티로 변환하고 저장
-        Category categoryEntity = new Category();
-        categoryEntity.setName(categoryRequest.getName());
+        // Request DTO를 엔티티로 변환하고 저장 (DTO -> Entity)
+        Category categoryEntity = categoryMapper.toEntity(categoryRequest);
         categoryRepository.save(categoryEntity);
     }
 
@@ -90,7 +86,5 @@ public class CategoryServiceImpl implements CategoryService{
 
         existCategory.setName(categoryRequest.getName());
         categoryRepository.save(existCategory);
-
     }
-
 }
