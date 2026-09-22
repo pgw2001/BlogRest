@@ -48,7 +48,14 @@ public class CategoryServiceImpl implements CategoryService{
         List<Category> categories =  categoryPage.getContent();
 
         // 엔티티를 DTO로 변환하여 반환 (Entity -> DTO)
-        return new CategoryResponse(categoryMapper.toResponseList(categories));
+        return new CategoryResponse(
+                categoryMapper.toResponseList(categories),
+                categoryPage.getNumber() + 1,
+                categoryPage.getSize(),
+                categoryPage.getTotalElements(),
+                categoryPage.getTotalPages(),
+                categoryPage.isLast()
+        );
     }
 
     @Override
