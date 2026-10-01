@@ -1,8 +1,8 @@
 package com.kimyanu.blog.service;
 
-import com.kimyanu.blog.dto.CategoryDto;
-import com.kimyanu.blog.dto.CategoryRequest;
-import com.kimyanu.blog.dto.CategoryResponse;
+import com.kimyanu.blog.dto.category.CategoryDto;
+import com.kimyanu.blog.dto.category.CategoryRequest;
+import com.kimyanu.blog.dto.category.CategoryResponse;
 import com.kimyanu.blog.exceptions.CategoryNotFoundException;
 import com.kimyanu.blog.mapper.CategoryMapper;
 import com.kimyanu.blog.model.Category;
@@ -49,7 +49,7 @@ public class CategoryServiceImpl implements CategoryService{
 
         // 엔티티를 DTO로 변환하여 반환 (Entity -> DTO)
         return new CategoryResponse(
-                categoryMapper.toResponseList(categories),
+                categoryMapper.toDtoList(categories),
                 categoryPage.getNumber() + 1,
                 categoryPage.getSize(),
                 categoryPage.getTotalElements(),

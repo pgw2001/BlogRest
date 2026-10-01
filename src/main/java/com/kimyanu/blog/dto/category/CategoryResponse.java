@@ -1,4 +1,4 @@
-package com.kimyanu.blog.dto;
+package com.kimyanu.blog.dto.category;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

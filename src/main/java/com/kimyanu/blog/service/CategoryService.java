@@ -1,8 +1,8 @@
 package com.kimyanu.blog.service;
 
-import com.kimyanu.blog.dto.CategoryDto;
-import com.kimyanu.blog.dto.CategoryRequest;
-import com.kimyanu.blog.dto.CategoryResponse;
+import com.kimyanu.blog.dto.category.CategoryDto;
+import com.kimyanu.blog.dto.category.CategoryRequest;
+import com.kimyanu.blog.dto.category.CategoryResponse;
 
 public interface CategoryService {
 

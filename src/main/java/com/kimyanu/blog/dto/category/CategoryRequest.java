@@ -1,4 +1,4 @@
-package com.kimyanu.blog.dto;
+package com.kimyanu.blog.dto.category;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
