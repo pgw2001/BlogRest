@@ -1,5 +1,6 @@
 package com.kimyanu.blog.service;
 
+import com.kimyanu.blog.dto.CategoryDto;
 import com.kimyanu.blog.dto.CategoryRequest;
 import com.kimyanu.blog.dto.CategoryResponse;
 
@@ -7,11 +8,11 @@ public interface CategoryService {
 
     CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
-    void createCategory(CategoryRequest categoryRequest);
+    CategoryDto createCategory(CategoryRequest categoryRequest);
 
-    void deleteCategory(Long categoryId);
+    CategoryDto deleteCategory(Long categoryId);
 
-    void updateCategory(Long id, CategoryRequest categoryRequest);
+    CategoryDto updateCategory(Long id, CategoryRequest categoryRequest);
 
 
 }

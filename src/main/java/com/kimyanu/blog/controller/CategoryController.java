@@ -1,6 +1,7 @@
 package com.kimyanu.blog.controller;
 
 import com.kimyanu.blog.config.AppConstant;
+import com.kimyanu.blog.dto.CategoryDto;
 import com.kimyanu.blog.dto.CategoryRequest;
 import com.kimyanu.blog.dto.CategoryResponse;
 import com.kimyanu.blog.service.CategoryService;
@@ -20,31 +21,30 @@ public class CategoryController {
     }
 
     @GetMapping("/public/categories")
-    public CategoryResponse getCategories(
+    public ResponseEntity<CategoryResponse> getCategories(
             @RequestParam(value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
             @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam(value = "sortBy", defaultValue = AppConstant.SORT_CATEGORY_BY) String sortBy,
             @RequestParam(value = "sortOrder", defaultValue = AppConstant.SORT_CATEGORY_ASC) String sortOrder
     ) {
-        System.out.println(sortBy + ", "  + sortOrder);
-        return categoryService.getAllCategories(pageNumber, pageSize, sortBy, sortOrder);
+        return ResponseEntity.ok(categoryService.getAllCategories(pageNumber, pageSize, sortBy, sortOrder));
     }
 
     @PostMapping("/admin/categories")
-    public ResponseEntity<Void> createCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
-            categoryService.createCategory(categoryRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).build(); //.build() - 본문이 필요하지 않다면
+    public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
+            CategoryDto createdCategory = categoryService.createCategory(categoryRequest);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory); //.build() - 본문이 필요하지 않다면
     }
 
     @DeleteMapping("/admin/categories/{categoryId}")
-    public ResponseEntity<Void> removeCategory(@PathVariable Long categoryId) {
-            categoryService.deleteCategory(categoryId);
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<CategoryDto> removeCategory(@PathVariable Long categoryId) {
+            CategoryDto deletedCategory = categoryService.deleteCategory(categoryId);
+            return ResponseEntity.ok(deletedCategory);
     }
 
     @PutMapping("/admin/categories/{categoryId}")
-    public ResponseEntity<Void> updateCategory(@PathVariable Long categoryId, @Valid @RequestBody CategoryRequest updatedCategoryRequest) {
-        categoryService.updateCategory(categoryId, updatedCategoryRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long categoryId, @Valid @RequestBody CategoryRequest updatedCategoryRequest) {
+        CategoryDto updatedCategory = categoryService.updateCategory(categoryId, updatedCategoryRequest);
+        return ResponseEntity.ok(updatedCategory);
     }
 }
