@@ -5,4 +5,7 @@ public class AppConstant {
         public static final String DEFAULT_PAGE_SIZE = "10";
         public static final String SORT_CATEGORY_BY = "id";
         public static final String SORT_CATEGORY_ASC = "asc";
+
+        public static final String SORT_MEMBER_BY = "id";
+        public static final String SORT_MEMBER_ASC = "asc";
 }

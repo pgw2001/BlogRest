@@ -1,5 +1,7 @@
 package com.kimyanu.blog.controller;
 
+import com.kimyanu.blog.config.AppConstant;
+import com.kimyanu.blog.dto.member.MemberPublicDto;
 import com.kimyanu.blog.dto.member.MemberRequest;
 import com.kimyanu.blog.dto.member.MemberResponse;
 import com.kimyanu.blog.service.MemberService;
@@ -18,14 +20,24 @@ public class MemberController {
         this.memberService = memberService;
     }
 
-    // TODO: 회원 목록 조회 기능 구현하기 (GET /api/admin/members), 회원 목록 조회 시 응답 값은 200 OK로 반환
     @GetMapping("/admin/members")
-    public ResponseEntity<MemberResponse> getAllMembers() {
-        MemberResponse response = memberService.getAllMembers();
+    public ResponseEntity<MemberResponse> getAllMembers(
+            @RequestParam(value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstant.SORT_MEMBER_BY) String sortBy,
+            @RequestParam(value = "sortOrder", defaultValue = AppConstant.SORT_MEMBER_ASC) String sortOrder
+    ) {
+        MemberResponse response = memberService.getAllMembers(pageNumber, pageSize, sortBy, sortOrder);
         return ResponseEntity.ok(response);
     }
 
-    // TODO: 회원가입 기능 구현하기 (POST /api/public/members), 회원가입 후 응답 값은 201 Created로 반환(빈 값)
+    @GetMapping("/public/members/{memberId}")
+    public ResponseEntity<MemberPublicDto> getMember(@PathVariable Long memberId) {
+        MemberPublicDto response = memberService.getMemberById(memberId);
+
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/public/members")
     public ResponseEntity<Void> createMember(@Valid @RequestBody MemberRequest memberRequest) {
         memberService.createMember(memberRequest);

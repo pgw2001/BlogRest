@@ -16,5 +16,5 @@ public class MemberDto {
     private String email;
     private String nickname;
     private String role;
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 }

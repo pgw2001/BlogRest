@@ -34,3 +34,29 @@ INSERT INTO category (id, name) VALUES (29, '질문답변');
 INSERT INTO category (id, name) VALUES (30, '공지사항');
 
 ALTER TABLE category ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM category);
+
+TRUNCATE TABLE member;
+
+-- 회원 샘플 데이터
+INSERT INTO member (id, email, password, nickname, role, created_at)
+VALUES (1, 'kim@test.com', '1234', '김코딩', 'USER', CURRENT_TIMESTAMP);
+INSERT INTO member (id, email, password, nickname, role, created_at)
+VALUES (2, 'lee@test.com', '1234', '이자바', 'USER', CURRENT_TIMESTAMP);
+INSERT INTO member (id, email, password, nickname, role, created_at)
+VALUES (3, 'park@test.com', '1234', '박스프링', 'USER', CURRENT_TIMESTAMP);
+INSERT INTO member (id, email, password, nickname, role, created_at)
+VALUES (4, 'choi@test.com', '1234', '최백엔드', 'USER', CURRENT_TIMESTAMP);
+INSERT INTO member (id, email, password, nickname, role, created_at)
+VALUES (5, 'jung@test.com', '1234', '정디비', 'USER', CURRENT_TIMESTAMP);
+INSERT INTO member (id, email, password, nickname, role, created_at)
+VALUES (6, 'kang@test.com', '1234', '강리액트', 'USER', CURRENT_TIMESTAMP);
+INSERT INTO member (id, email, password, nickname, role, created_at)
+VALUES (7, 'yoon@test.com', '1234', '윤파이썬', 'USER', CURRENT_TIMESTAMP);
+INSERT INTO member (id, email, password, nickname, role, created_at)
+VALUES (8, 'lim@test.com', '1234', '임데브옵스', 'USER', CURRENT_TIMESTAMP);
+INSERT INTO member (id, email, password, nickname, role, created_at)
+VALUES (9, 'han@test.com', '1234', '한알고', 'USER', CURRENT_TIMESTAMP);
+INSERT INTO member (id, email, password, nickname, role, created_at)
+VALUES (10, 'oh@test.com', '1234', '오퍼블', 'USER', CURRENT_TIMESTAMP);
+
+ALTER TABLE MEMBER ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM MEMBER);
