@@ -3,6 +3,8 @@ package com.kimyanu.blog.service;
 import com.kimyanu.blog.dto.member.MemberPublicDto;
 import com.kimyanu.blog.dto.member.MemberRequest;
 import com.kimyanu.blog.dto.member.MemberResponse;
+import com.kimyanu.blog.dto.member.MemberUpdateRequest;
+import jakarta.validation.Valid;
 
 public interface MemberService {
     void createMember(MemberRequest memberRequest);
@@ -10,4 +12,6 @@ public interface MemberService {
     MemberResponse getAllMembers(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
     MemberPublicDto getMemberById(Long memberId);
+
+    MemberPublicDto updateMember(@Valid Long memberId, MemberUpdateRequest memberUpdateRequest);
 }

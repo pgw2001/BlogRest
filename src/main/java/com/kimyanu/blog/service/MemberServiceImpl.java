@@ -3,6 +3,7 @@ package com.kimyanu.blog.service;
 import com.kimyanu.blog.dto.member.MemberPublicDto;
 import com.kimyanu.blog.dto.member.MemberRequest;
 import com.kimyanu.blog.dto.member.MemberResponse;
+import com.kimyanu.blog.dto.member.MemberUpdateRequest;
 import com.kimyanu.blog.enums.UserRole;
 import com.kimyanu.blog.mapper.MemberMapper;
 import com.kimyanu.blog.model.Member;
@@ -73,6 +74,23 @@ public class MemberServiceImpl implements MemberService{
         Member memberEntity = memberMapper.toEntity(memberRequest);
         memberEntity.setRole(UserRole.USER);
         memberRepository.save(memberEntity);
+    }
+
+    @Override
+    @Transactional
+    public MemberPublicDto updateMember(Long memberId, MemberUpdateRequest memberUpdateRequest) {
+        // 가져오기
+        Member existingMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException("해당 id의 회원을 찾을 수 없습니다. : " + memberId));
+
+        // 예외처리
+        boolean nicknameChanged = !existingMember.getNickname().equals(memberUpdateRequest.getNickname());
+        if (nicknameChanged && memberRepository.existsByNickname(memberUpdateRequest.getNickname())) {
+            throw new IllegalStateException("이미 사용 중인 닉네임입니다: " + memberUpdateRequest.getNickname());
+        }
+
+        memberMapper.updateEntityFromRequest(existingMember, memberUpdateRequest);
+        return memberMapper.toPublicDto(existingMember);
     }
 
 }

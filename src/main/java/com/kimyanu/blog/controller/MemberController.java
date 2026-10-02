@@ -4,6 +4,7 @@ import com.kimyanu.blog.config.AppConstant;
 import com.kimyanu.blog.dto.member.MemberPublicDto;
 import com.kimyanu.blog.dto.member.MemberRequest;
 import com.kimyanu.blog.dto.member.MemberResponse;
+import com.kimyanu.blog.dto.member.MemberUpdateRequest;
 import com.kimyanu.blog.service.MemberService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -42,5 +43,12 @@ public class MemberController {
     public ResponseEntity<Void> createMember(@Valid @RequestBody MemberRequest memberRequest) {
         memberService.createMember(memberRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    // TODO: 회원정보 수정하기, (PUT /api/public/members/{memberId}) - 스프링 시큐리티 도입 시 본인 확인 추가, (MemberPublicDto <- 이건 왜 써준건지는 모르겠음) nickname, password 수정 가능
+    @PutMapping("/public/members/{memberId}")
+    public ResponseEntity<MemberPublicDto> updateMember(@PathVariable Long memberId, @Valid @RequestBody MemberUpdateRequest memberUpdateRequest) {
+        memberService.updateMember(memberId, memberUpdateRequest);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
