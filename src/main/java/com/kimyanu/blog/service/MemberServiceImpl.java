@@ -73,6 +73,7 @@ public class MemberServiceImpl implements MemberService{
 
         Member memberEntity = memberMapper.toEntity(memberRequest);
         memberEntity.setRole(UserRole.USER);
+        // TODO: 비밀번호 평문 저장되는 문제 스프링 시큐리티에서 해결
         memberRepository.save(memberEntity);
     }
 
@@ -91,6 +92,21 @@ public class MemberServiceImpl implements MemberService{
 
         memberMapper.updateEntityFromRequest(existingMember, memberUpdateRequest);
         return memberMapper.toPublicDto(existingMember);
+    }
+
+    @Override
+    public void deleteMember(Long memberId) {
+        // 1. 객체 저장 후 delete로 삭제
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException("해당 ID의 회원을 잧을 수 없습니다. : " + memberId));
+        memberRepository.delete(member);
+
+        // 2. id 존재 확인 후 deleteById로 삭제
+//        boolean existingMember = memberRepository.existsById(memberId);
+//        if(!existingMember) {
+//            throw new NoSuchElementException("해당 ID의 회원을 찾을 수 없습니다. : " + memberId);
+//        }
+//        memberRepository.deleteById(memberId);
     }
 
 }

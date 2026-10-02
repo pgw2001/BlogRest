@@ -45,10 +45,18 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    // TODO: 회원정보 수정하기, (PUT /api/public/members/{memberId}) - 스프링 시큐리티 도입 시 본인 확인 추가, (MemberPublicDto <- 이건 왜 써준건지는 모르겠음) nickname, password 수정 가능
+    // TODO: 스프링 시큐리티 도입 시 복인 확인 추가 (nickname, password)
     @PutMapping("/public/members/{memberId}")
     public ResponseEntity<MemberPublicDto> updateMember(@PathVariable Long memberId, @Valid @RequestBody MemberUpdateRequest memberUpdateRequest) {
-        memberService.updateMember(memberId, memberUpdateRequest);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        MemberPublicDto updatedMember = memberService.updateMember(memberId, memberUpdateRequest);
+        return ResponseEntity.ok(updatedMember);
+    }
+
+    // TODO: 스프링 시큐리티 도입 시 복인 확인 추가
+    // TODO: 물리 삭제 - 게시글/댓글 추가 후 논리 삭제로 전환
+    @DeleteMapping("/public/members/{memberId}")
+    public ResponseEntity<Void> deleteMember(@PathVariable Long memberId) {
+        memberService.deleteMember(memberId);
+        return ResponseEntity.noContent().build();
     }
 }

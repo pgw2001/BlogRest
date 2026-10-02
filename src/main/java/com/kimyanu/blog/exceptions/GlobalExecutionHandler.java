@@ -2,6 +2,7 @@ package com.kimyanu.blog.exceptions;
 
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -51,6 +52,12 @@ public class GlobalExecutionHandler {
     @ExceptionHandler(JpaSystemException.class)
     public ResponseEntity<ErrorResponse> handleJpaSystemException(JpaSystemException e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("데이터베이스 처리과정에서 오류가 발생하였습니다.", false));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse("이미 사용 중인 값입니다.", false));
     }
 }
 
