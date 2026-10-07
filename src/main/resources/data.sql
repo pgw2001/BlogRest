@@ -1,6 +1,3 @@
--- TRUNCATING TABLES:
-TRUNCATE TABLE category;
-
 -- SAMPLE DATA:
 INSERT INTO category (id, name) VALUES (1, '개발일지');
 INSERT INTO category (id, name) VALUES (2, '자바/스프링');
@@ -34,8 +31,6 @@ INSERT INTO category (id, name) VALUES (29, '질문답변');
 INSERT INTO category (id, name) VALUES (30, '공지사항');
 
 ALTER TABLE category ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM category);
-
-TRUNCATE TABLE member;
 
 -- 회원 샘플 데이터
 INSERT INTO member (id, email, password, nickname, role, created_at)
