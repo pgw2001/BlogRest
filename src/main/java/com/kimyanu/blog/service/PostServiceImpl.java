@@ -52,7 +52,7 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public PostResponse getAllPosts() {
-        List<Post> posts = postRepository.findAll();
+        List<Post> posts = postRepository.findAllBy();
         return new PostResponse(
                 postMapper.toDtoList(posts)
         );
