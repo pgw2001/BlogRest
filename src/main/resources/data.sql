@@ -54,4 +54,51 @@ VALUES (9, 'han@test.com', '1234', '한알고', 'USER', CURRENT_TIMESTAMP);
 INSERT INTO member (id, email, password, nickname, role, created_at)
 VALUES (10, 'oh@test.com', '1234', '오퍼블', 'USER', CURRENT_TIMESTAMP);
 
+-- 게시글 샘플 데이터 (is_visible = FALSE 2건 포함)
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (1, 1, 2, '스프링 부트 첫 프로젝트 만들기', 'Spring Initializr로 프로젝트를 생성하고 실행해봤습니다. 생각보다 설정이 간단했습니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (2, 4, 5, '데이터베이스 인덱스가 뭔가요', '인덱스를 걸면 조회는 빨라지고 쓰기는 느려진다는 걸 이제야 이해했습니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (3, 2, 2, 'JPA 연관관계 매핑 정리', '@ManyToOne과 @OneToMany의 차이, 그리고 관계의 주인이 누구인지 정리해봤습니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (4, 6, 3, '리액트 useEffect 의존성 배열', '의존성 배열을 빼먹었다가 무한 루프를 겪었습니다. 기록으로 남깁니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (5, 3, 2, '@Transactional 동작 원리', '프록시 기반으로 동작하기 때문에 같은 클래스 내부 호출에서는 적용되지 않습니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (6, 9, 9, '이분 탐색 구현할 때 실수하는 부분', 'while 조건과 mid 계산에서 오버플로가 날 수 있습니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (7, 5, 5, 'N+1 문제를 처음 만났습니다', '목록 조회 한 번에 쿼리가 스무 번 나가는 걸 로그로 확인했습니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (8, 7, 4, '파이썬 리스트 컴프리헨션', '간결하지만 너무 중첩하면 읽기 어려워집니다. 적당히 쓰는 게 좋습니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (9, 1, 10, 'HTTP 상태 코드 정리', '200, 201, 204, 400, 404, 409를 언제 쓰는지 표로 만들어봤습니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (10, 8, 8, '도커 컴포즈로 로컬 환경 구성', 'DB와 애플리케이션을 한 번에 띄우니 협업이 훨씬 편해졌습니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (11, 10, 6, 'CSS Flexbox 정렬 총정리', 'justify-content와 align-items를 계속 헷갈렸는데 이제 확실히 구분합니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (12, 2, 1, '오늘의 개발일지', '리팩터링만 세 시간 했습니다. 코드는 줄었는데 뿌듯하네요.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (13, 4, 14, '신입 백엔드 개발자 회고', '입사 6개월차에 느낀 점을 솔직하게 적어봤습니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (14, 6, 3, '리액트 상태 관리 라이브러리 비교', 'Redux, Zustand, Recoil을 실제로 써보고 비교했습니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (15, 3, 5, 'JPA 영속성 컨텍스트 이해하기', '1차 캐시 덕분에 같은 엔티티를 두 번 조회해도 쿼리는 한 번만 나갑니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (16, 7, 15, '클린 코드 읽고 나서', '이름 짓기에 시간을 더 써야겠다는 생각이 들었습니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (17, 5, 11, '자바 25 릴리스 소식 정리', '새로 추가된 기능들을 간단히 훑어봤습니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (18, 9, 9, '다이나믹 프로그래밍 입문', '피보나치부터 시작해서 점화식 세우는 법을 익혔습니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (19, 8, 16, '개발자를 위한 생산성 도구', '단축키만 잘 써도 하루에 삼십 분은 아낍니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (20, 10, 7, '안드로이드 첫 앱 배포기', '스토어 심사에서 두 번 반려당한 이야기입니다.', TRUE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (21, 1, 1, '작성 중인 초안입니다', '아직 정리가 안 끝나서 비공개로 둡니다.', FALSE, CURRENT_TIMESTAMP);
+INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
+VALUES (22, 5, 17, '블로그 개편 계획 메모', '공개하기 전에 더 다듬어야 합니다.', FALSE, CURRENT_TIMESTAMP);
+
 ALTER TABLE MEMBER ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM MEMBER);
+ALTER TABLE POST ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM POST);

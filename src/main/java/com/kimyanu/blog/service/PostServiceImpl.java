@@ -2,6 +2,7 @@ package com.kimyanu.blog.service;
 
 import com.kimyanu.blog.dto.post.PostDto;
 import com.kimyanu.blog.dto.post.PostRequest;
+import com.kimyanu.blog.dto.post.PostResponse;
 import com.kimyanu.blog.exceptions.CategoryNotFoundException;
 import com.kimyanu.blog.mapper.PostMapper;
 import com.kimyanu.blog.model.Category;
@@ -13,6 +14,7 @@ import com.kimyanu.blog.repository.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -46,5 +48,13 @@ public class PostServiceImpl implements PostService{
 
         Post savedPost = postRepository.save(postEntity);
         return postMapper.toDto(savedPost);
+    }
+
+    @Override
+    public PostResponse getAllPosts() {
+        List<Post> posts = postRepository.findAll();
+        return new PostResponse(
+                postMapper.toDtoList(posts)
+        );
     }
 }
