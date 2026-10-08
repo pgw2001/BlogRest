@@ -13,4 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 public class PostResponse {
     private List<PostDto> content;
+    private Integer pageNumber;
+    private Integer pageSize;
+    private Long totalElements;
+    private Integer totalPage;
+    private Boolean lastPage;
 }

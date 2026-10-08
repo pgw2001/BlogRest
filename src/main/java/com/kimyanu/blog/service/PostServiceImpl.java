@@ -11,15 +11,20 @@ import com.kimyanu.blog.model.Post;
 import com.kimyanu.blog.repository.CategoryRepository;
 import com.kimyanu.blog.repository.MemberRepository;
 import com.kimyanu.blog.repository.PostRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static com.kimyanu.blog.util.PageableFactory.getPageable;
+
 @Service
 public class PostServiceImpl implements PostService{
 
+    private final List<String> SORTABLE_FIELDS = List.of("id", "title", "content", "createdAt");
     private final PostRepository postRepository;
     private final PostMapper postMapper;
     private final MemberRepository memberRepository;
@@ -51,10 +56,18 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public PostResponse getAllPosts() {
-        List<Post> posts = postRepository.findAllBy();
+    public PostResponse getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        Pageable pageDetails = getPageable(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
+        Page<Post> postPage = postRepository.findByIsVisibleTrue(pageDetails);
+        List<Post> posts = postPage.getContent();
+
         return new PostResponse(
-                postMapper.toDtoList(posts)
+                postMapper.toDtoList(posts),
+                postPage.getNumber() + 1,
+                postPage.getSize(),
+                postPage.getTotalElements(),
+                postPage.getTotalPages(),
+                postPage.isLast()
         );
     }
 

@@ -1,5 +1,6 @@
 package com.kimyanu.blog.controller;
 
+import com.kimyanu.blog.config.AppConstant;
 import com.kimyanu.blog.dto.post.PostDto;
 import com.kimyanu.blog.dto.post.PostRequest;
 import com.kimyanu.blog.dto.post.PostResponse;
@@ -25,8 +26,13 @@ public class PostController {
     }
 
     @GetMapping("/public/posts")
-    public ResponseEntity<PostResponse> getAllPosts() {
-        PostResponse posts = postService.getAllPosts();
+    public ResponseEntity<PostResponse> getAllPosts(
+            @RequestParam (value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
+            @RequestParam (value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
+            @RequestParam (value = "sortBy", defaultValue = AppConstant.SORT_POST_BY) String sortBy,
+            @RequestParam (value = "sortOrder", defaultValue = AppConstant.SORT_POST_ASC) String sortOrder
+            ) {
+        PostResponse posts = postService.getAllPosts(pageNumber, pageSize, sortBy, sortOrder);
         return ResponseEntity.ok(posts);
     }
 
@@ -47,7 +53,6 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
-    // TODO: 수정하기 (PUT /public/posts/{postId}), PostDto 반환하도록 구현 필요
     // TODO: 스프링 시큐리티 도입 후 작성자 본인 확인 로직 추가 필요
     @PutMapping("/public/posts/{postId}")
     public ResponseEntity<PostDto> updatePost(@PathVariable Long postId, @Valid @RequestBody PostRequest postRequest) {

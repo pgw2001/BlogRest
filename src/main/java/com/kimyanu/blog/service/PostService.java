@@ -7,7 +7,7 @@ import com.kimyanu.blog.dto.post.PostResponse;
 public interface PostService {
     PostDto createPost(PostRequest postRequest, Long memberId);
 
-    PostResponse getAllPosts();
+    PostResponse getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
     PostDto getPostById(Long postId);
 
