@@ -75,4 +75,22 @@ public class PostServiceImpl implements PostService{
 
         postRepository.delete(existingPost);
     }
+
+    @Override
+    @Transactional
+    public PostDto updatePost(Long postId, PostRequest postRequest) {
+
+        Post existingPost = postRepository.findWithMemberAndCategoryById(postId)
+                .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다 : " + postId));
+
+        if(postRequest.getCategoryId() != null && !postRequest.getCategoryId().equals(existingPost.getCategory().getId())) {
+            Category category = categoryRepository.findById(postRequest.getCategoryId())
+                    .orElseThrow(() -> new CategoryNotFoundException(postRequest.getCategoryId()));
+            existingPost.setCategory(category);
+        }
+
+        postMapper.updateEntityFromRequest(existingPost, postRequest);
+
+        return postMapper.toDto(existingPost);
+    }
 }

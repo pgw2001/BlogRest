@@ -24,5 +24,9 @@ public interface MemberMapper {
     Member toEntity(MemberRequest memberRequest);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "email", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     void updateEntityFromRequest(@MappingTarget Member existingMember, MemberUpdateRequest memberUpdateRequest);
 }

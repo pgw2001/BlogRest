@@ -47,5 +47,15 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
+    // TODO: 수정하기 (PUT /public/posts/{postId}), PostDto 반환하도록 구현 필요
+    // TODO: 스프링 시큐리티 도입 후 작성자 본인 확인 로직 추가 필요
+    @PutMapping("/public/posts/{postId}")
+    public ResponseEntity<PostDto> updatePost(@PathVariable Long postId, @Valid @RequestBody PostRequest postRequest) {
+
+        PostDto updatedPost = postService.updatePost(postId, postRequest);
+
+        return ResponseEntity.ok(updatedPost);
+    }
+
 
 }

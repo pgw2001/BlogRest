@@ -3,8 +3,7 @@ package com.kimyanu.blog.mapper;
 import com.kimyanu.blog.dto.post.PostDto;
 import com.kimyanu.blog.dto.post.PostRequest;
 import com.kimyanu.blog.model.Post;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -22,6 +21,13 @@ public interface PostMapper {
     @Mapping(source = "category.id", target = "categoryId")
     @Mapping(source = "category.name", target = "categoryName")
     PostDto toDto(Post post);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "member", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    void updateEntityFromRequest(@MappingTarget Post existingPost, PostRequest postRequest);
 
     List<PostDto> toDtoList(List<Post> posts);
 }
