@@ -8,4 +8,6 @@ public interface PostService {
     PostDto createPost(PostRequest postRequest, Long memberId);
 
     PostResponse getAllPosts();
+
+    PostDto getPostById(Long postId);
 }

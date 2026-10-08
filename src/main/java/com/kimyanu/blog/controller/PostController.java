@@ -23,11 +23,20 @@ public class PostController {
         PostDto postDto = postService.createPost(postRequest, memberId);
         return ResponseEntity.ok(postDto);
     }
-    // TODO: 게시글 조회 (GET /api/public/posts) - 반환: PostResponse 객체
+
     @GetMapping("/public/posts")
     public ResponseEntity<PostResponse> getAllPosts() {
         PostResponse posts = postService.getAllPosts();
         return ResponseEntity.ok(posts);
     }
+
+    @GetMapping("/public/posts/{postId}")
+    public ResponseEntity<PostDto> getPostById(@PathVariable Long postId) {
+
+        PostDto post = postService.getPostById(postId);
+
+        return ResponseEntity.ok(post);
+    }
+
 
 }

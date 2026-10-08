@@ -57,4 +57,13 @@ public class PostServiceImpl implements PostService{
                 postMapper.toDtoList(posts)
         );
     }
+
+    @Override
+    public PostDto getPostById(Long postId) {
+
+        Post post = postRepository.findWithMemberAndCategoryById(postId)
+                .orElseThrow(() -> new NoSuchElementException("해당 ID의 게시글을 찾을 수 없습니다. : " + postId));
+
+        return postMapper.toDto(post);
+    }
 }
