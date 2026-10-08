@@ -75,6 +75,7 @@ public class PostServiceImpl implements PostService{
     public PostDto getPostById(Long postId) {
 
         Post post = postRepository.findWithMemberAndCategoryById(postId)
+                .filter(Post::getIsVisible)
                 .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다 : " + postId));
 
         return postMapper.toDto(post);
