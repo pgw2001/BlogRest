@@ -38,5 +38,14 @@ public class PostController {
         return ResponseEntity.ok(post);
     }
 
+    //TODO: 스프링 시큐리티 도입 시 작성자 본인 확인 필요
+    @DeleteMapping("/public/posts/{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
+
+        postService.deletePost(postId);
+
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

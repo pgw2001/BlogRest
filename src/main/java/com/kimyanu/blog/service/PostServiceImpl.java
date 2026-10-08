@@ -62,8 +62,17 @@ public class PostServiceImpl implements PostService{
     public PostDto getPostById(Long postId) {
 
         Post post = postRepository.findWithMemberAndCategoryById(postId)
-                .orElseThrow(() -> new NoSuchElementException("해당 ID의 게시글을 찾을 수 없습니다. : " + postId));
+                .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다 : " + postId));
 
         return postMapper.toDto(post);
+    }
+
+    @Override
+    public void deletePost(Long postId) {
+
+        Post existingPost = postRepository.findWithMemberAndCategoryById(postId)
+                .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다 : " + postId));
+
+        postRepository.delete(existingPost);
     }
 }
