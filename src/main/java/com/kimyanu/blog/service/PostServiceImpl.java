@@ -38,24 +38,6 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public PostDto createPost(PostRequest postRequest, Long memberId) {
-
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NoSuchElementException("해당 ID의 회원을 찾을 수 없습니다. : " + memberId));
-
-        Category category = categoryRepository.findById(postRequest.getCategoryId())
-                .orElseThrow(() -> new CategoryNotFoundException(postRequest.getCategoryId()));
-
-        Post postEntity = postMapper.toEntity(postRequest);
-        postEntity.setMember(member);
-        postEntity.setCategory(category);
-
-        Post savedPost = postRepository.save(postEntity);
-        return postMapper.toDto(savedPost);
-    }
-
-    @Override
     public PostResponse getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         Pageable pageDetails = getPageable(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
         Page<Post> postPage = postRepository.findByIsVisibleTrue(pageDetails);
@@ -82,12 +64,21 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public void deletePost(Long postId) {
+    @Transactional(readOnly = true)
+    public PostDto createPost(PostRequest postRequest, Long memberId) {
 
-        Post existingPost = postRepository.findWithMemberAndCategoryById(postId)
-                .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다 : " + postId));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException("해당 ID의 회원을 찾을 수 없습니다. : " + memberId));
 
-        postRepository.delete(existingPost);
+        Category category = categoryRepository.findById(postRequest.getCategoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(postRequest.getCategoryId()));
+
+        Post postEntity = postMapper.toEntity(postRequest);
+        postEntity.setMember(member);
+        postEntity.setCategory(category);
+
+        Post savedPost = postRepository.save(postEntity);
+        return postMapper.toDto(savedPost);
     }
 
     @Override
@@ -106,5 +97,14 @@ public class PostServiceImpl implements PostService{
         postMapper.updateEntityFromRequest(existingPost, postRequest);
 
         return postMapper.toDto(existingPost);
+    }
+
+    @Override
+    public void deletePost(Long postId) {
+
+        Post existingPost = postRepository.findWithMemberAndCategoryById(postId)
+                .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다 : " + postId));
+
+        postRepository.delete(existingPost);
     }
 }

@@ -77,26 +77,9 @@ public class CategoryServiceImpl implements CategoryService{
 
     @Override
     @Transactional
-    public CategoryDto deleteCategory(Long categoryId) {
-        // 데이터를 지운다는 목적은 똑같다.
-        // findById + delete() : 존재 확인 + 객체가 필요할 때.
-        // existsById + deleteById : 존재 여부를 명시적으로 확인하고 삭제할 때.
-        // deleteById : 존재 여부를 굳이 확인하지 않고 바로 삭제할 때.
-        // findById + 예외 + delete() : 존재 여부를 확인하고, 존재하지 않으면 예외 처리까지 하면서 삭제할 때.
-        Category category = categoryRepository
-                .findById(categoryId)
-                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
-
-        categoryRepository.delete(category);
-        // categoryRepository.deleteById(category);
-        return categoryMapper.toDto(category);
-    }
-
-    @Override
-    @Transactional
     public CategoryDto updateCategory(Long categoryId, CategoryRequest categoryRequest) {
 
-       Category existCategory = categoryRepository
+        Category existCategory = categoryRepository
                 .findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
@@ -115,5 +98,22 @@ public class CategoryServiceImpl implements CategoryService{
 
         existCategory.setName(categoryRequest.getName());
         return categoryMapper.toDto(existCategory);
+    }
+
+    @Override
+    @Transactional
+    public CategoryDto deleteCategory(Long categoryId) {
+        // 데이터를 지운다는 목적은 똑같다.
+        // findById + delete() : 존재 확인 + 객체가 필요할 때.
+        // existsById + deleteById : 존재 여부를 명시적으로 확인하고 삭제할 때.
+        // deleteById : 존재 여부를 굳이 확인하지 않고 바로 삭제할 때.
+        // findById + 예외 + delete() : 존재 여부를 확인하고, 존재하지 않으면 예외 처리까지 하면서 삭제할 때.
+        Category category = categoryRepository
+                .findById(categoryId)
+                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+
+        categoryRepository.delete(category);
+        // categoryRepository.deleteById(category);
+        return categoryMapper.toDto(category);
     }
 }

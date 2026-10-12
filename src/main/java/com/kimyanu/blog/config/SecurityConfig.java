@@ -1,0 +1,59 @@
+package com.kimyanu.blog.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                // URL 기반의 권한 설정
+                // .requestMatchers() : 특정 URL 패턴에 대한 권한 설정
+                // anyRequest() : 나머지 모든 요청
+                // permitAll() : 모든 사용자에게 허용
+                // authenticated() : 인증된 사용자만 허용
+                // /error
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+                        .anyRequest().authenticated()
+                )
+                // 로그인 폼을 기본 설정으로 활성화(쓸 필요없음 세션 안쓰니까)
+//                .formLogin(Customizer.withDefaults())
+                // HTTP Basic 인증 방식을 기본 설정으로 활성화
+                // 이게 없으면 인증하는 방법이 없어서 인증 정보를 보내도 403 에러가 발생한다.
+                .httpBasic(Customizer.withDefaults())
+
+                // CSRF 보호 기능을 활성화 (<form action="">) 요청에 대해 CSRF 토큰을 검증하도록 설정
+                // 사용자 자신의 의지와 무관하게 공격자가 의도한 수정, 삭제, 등록 등(POST, PUT, DELETE)의 행위를 서버에 수행하게 만드는 공격을 의미
+                // CSRF 공격을 방지하기 위해 서버는 요청에 CSRF 토큰을 포함하도록 요구
+                // 그래서 아래 설정은 CSRF 보호 기능을 비활성화하는 설정으로, REST API에서는 일반적으로 CSRF 보호를 비활성화하는 경우가 많다.
+                .csrf(AbstractHttpConfigurer::disable)
+
+                // H2 콘솔을 위한 설정
+                // 같은 출처에서만 프레임을 허용하도록 설정
+                // 이게 없으면 H2 콘솔 화면이 깨진다. (X-Frame-Options DENY 에러)
+                .headers(headers -> headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+                )
+
+                // 세션을 만들지 않고 사용하지도 않는다
+                // 이게 없으면 인증 없이 인증이 필요한 경로를 호출활 때 세선이 만들어지고, 401 응답에 JSESSIONID 쿠키가 내려온다.
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                );
+
+        return http.build();
+    }
+}
