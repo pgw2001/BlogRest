@@ -6,18 +6,16 @@ import com.kimyanu.blog.dto.post.PostRequest;
 import com.kimyanu.blog.dto.post.PostResponse;
 import com.kimyanu.blog.service.PostService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class PostController {
 
     private final PostService postService;
-
-    public PostController(PostService postService) {
-        this.postService = postService;
-    }
 
     @PostMapping("/public/posts")
     public ResponseEntity<PostDto> createPost(@Valid @RequestBody PostRequest postRequest, @RequestParam("memberId") Long memberId) {

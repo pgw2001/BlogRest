@@ -7,6 +7,7 @@ import com.kimyanu.blog.exceptions.CategoryNotFoundException;
 import com.kimyanu.blog.mapper.CategoryMapper;
 import com.kimyanu.blog.model.Category;
 import com.kimyanu.blog.repository.CategoryRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,17 +25,13 @@ import static com.kimyanu.blog.util.PageableFactory.getPageable;
 // deleteAll() -> delete(방식) + All(조건)
 
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CategoryServiceImpl implements CategoryService{
 
     private static final List<String> SORTABLE_FIELDS = List.of("id", "name");
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
-
-    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
-        this.categoryRepository = categoryRepository;
-        this.categoryMapper = categoryMapper;
-    }
 
     @Override
     public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {

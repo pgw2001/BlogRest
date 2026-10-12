@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -43,7 +45,7 @@ public class SecurityConfig {
 
                 // H2 콘솔을 위한 설정
                 // 같은 출처에서만 프레임을 허용하도록 설정
-                // 이게 없으면 H2 콘솔 화면이 깨진다. (X-Frame-Options DENY 에러)
+                // 이게 없이면 H2 콘솔 화면이 깨진다. (X-Frame-Options DENY 에러)
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                 )
@@ -55,5 +57,10 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

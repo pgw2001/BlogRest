@@ -7,19 +7,17 @@ import com.kimyanu.blog.dto.member.MemberResponse;
 import com.kimyanu.blog.dto.member.MemberUpdateRequest;
 import com.kimyanu.blog.service.MemberService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
-
-    public MemberController(MemberService memberService) {
-        this.memberService = memberService;
-    }
 
     @GetMapping("/admin/members")
     public ResponseEntity<MemberResponse> getAllMembers(

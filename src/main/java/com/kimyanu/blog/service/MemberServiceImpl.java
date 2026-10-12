@@ -8,8 +8,10 @@ import com.kimyanu.blog.enums.UserRole;
 import com.kimyanu.blog.mapper.MemberMapper;
 import com.kimyanu.blog.model.Member;
 import com.kimyanu.blog.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,16 +21,13 @@ import java.util.NoSuchElementException;
 import static com.kimyanu.blog.util.PageableFactory.getPageable;
 
 @Service
+@RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService{
 
     private final List<String> SORTABLE_FIELDS = List.of("id", "nickname", "email", "createdAt");
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
-
-    public MemberServiceImpl(MemberRepository memberRepository, MemberMapper memberMapper) {
-        this.memberRepository = memberRepository;
-        this.memberMapper = memberMapper;
-    }
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public MemberResponse getAllMembers(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
@@ -73,7 +72,7 @@ public class MemberServiceImpl implements MemberService{
 
         Member memberEntity = memberMapper.toEntity(memberRequest);
         memberEntity.setRole(UserRole.USER);
-        // TODO: 비밀번호 평문 저장되는 문제 스프링 시큐리티에서 해결
+        memberEntity.setPassword(passwordEncoder.encode(memberRequest.getPassword()));
         memberRepository.save(memberEntity);
     }
 
@@ -84,13 +83,20 @@ public class MemberServiceImpl implements MemberService{
         Member existingMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("해당 id의 회원을 찾을 수 없습니다. : " + memberId));
 
-        // 예외처리
-        boolean nicknameChanged = !existingMember.getNickname().equals(memberUpdateRequest.getNickname());
-        if (nicknameChanged && memberRepository.existsByNickname(memberUpdateRequest.getNickname())) {
-            throw new IllegalStateException("이미 사용 중인 닉네임입니다: " + memberUpdateRequest.getNickname());
+        // 닉네임 변경 사항 처리 (null이 아닌 경우에만 업데이트)
+        String newNickname = memberUpdateRequest.getNickname();
+        if (newNickname != null && !newNickname.isBlank()) {
+            boolean nicknameChanged = !existingMember.getNickname().equals(newNickname);
+            if (nicknameChanged && memberRepository.existsByNickname(newNickname)) {
+                throw new IllegalStateException("이미 사용 중인 닉네임입니다: " + newNickname);
+            }
+            existingMember.setNickname(newNickname);
         }
 
-        memberMapper.updateEntityFromRequest(existingMember, memberUpdateRequest);
+        // 비밀번호 변경 사항 처리
+        if (memberUpdateRequest.getPassword() != null) {
+            existingMember.setPassword(passwordEncoder.encode(memberUpdateRequest.getPassword()));
+        }
         return memberMapper.toPublicDto(existingMember);
     }
 

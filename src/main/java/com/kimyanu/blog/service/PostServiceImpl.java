@@ -11,6 +11,7 @@ import com.kimyanu.blog.model.Post;
 import com.kimyanu.blog.repository.CategoryRepository;
 import com.kimyanu.blog.repository.MemberRepository;
 import com.kimyanu.blog.repository.PostRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.util.NoSuchElementException;
 import static com.kimyanu.blog.util.PageableFactory.getPageable;
 
 @Service
+@RequiredArgsConstructor
 public class PostServiceImpl implements PostService{
 
     private final List<String> SORTABLE_FIELDS = List.of("id", "title", "content", "createdAt");
@@ -29,13 +31,6 @@ public class PostServiceImpl implements PostService{
     private final PostMapper postMapper;
     private final MemberRepository memberRepository;
     private final CategoryRepository categoryRepository;
-
-    public PostServiceImpl(PostRepository postRepository, PostMapper postMapper, MemberRepository memberRepository, CategoryRepository categoryRepository) {
-        this.postRepository = postRepository;
-        this.postMapper = postMapper;
-        this.memberRepository = memberRepository;
-        this.categoryRepository = categoryRepository;
-    }
 
     @Override
     public PostResponse getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
