@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")  // hasAuthority("ADMIN")도 사용가능한데 앞에 ROLE_ 지워야됨
                         .anyRequest().authenticated()
                 )
                 // 로그인 폼을 기본 설정으로 활성화(쓸 필요없음 세션 안쓰니까)
