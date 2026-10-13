@@ -5,11 +5,13 @@ import com.kimyanu.blog.dto.member.MemberPublicDto;
 import com.kimyanu.blog.dto.member.MemberRequest;
 import com.kimyanu.blog.dto.member.MemberResponse;
 import com.kimyanu.blog.dto.member.MemberUpdateRequest;
+import com.kimyanu.blog.security.CustomUserDetails;
 import com.kimyanu.blog.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -43,18 +45,18 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    // TODO: 스프링 시큐리티 도입 시 복인 확인 추가 (nickname, password)
-    @PutMapping("/public/members/{memberId}")
-    public ResponseEntity<MemberPublicDto> updateMember(@PathVariable Long memberId, @Valid @RequestBody MemberUpdateRequest memberUpdateRequest) {
-        MemberPublicDto updatedMember = memberService.updateMember(memberId, memberUpdateRequest);
+    @PutMapping("/members/me")
+    public ResponseEntity<MemberPublicDto> updateMember(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody MemberUpdateRequest memberUpdateRequest) {
+        MemberPublicDto updatedMember = memberService.updateMember(userDetails.getMemberId(), memberUpdateRequest);
         return ResponseEntity.ok(updatedMember);
     }
 
-    // TODO: 스프링 시큐리티 도입 시 복인 확인 추가
     // TODO: 물리 삭제 - 게시글/댓글 추가 후 논리 삭제로 전환
-    @DeleteMapping("/public/members/{memberId}")
-    public ResponseEntity<Void> deleteMember(@PathVariable Long memberId) {
-        memberService.deleteMember(memberId);
+    @DeleteMapping("/members/me")
+    public ResponseEntity<Void> deleteMember(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        memberService.deleteMember(userDetails.getMemberId());
         return ResponseEntity.noContent().build();
     }
 }

@@ -12,14 +12,14 @@ import java.util.Collection;
 import java.util.List;
 
 @Getter
-public class CustomeUserDetails implements UserDetails {
+public class CustomUserDetails implements UserDetails {
 
     private final Long memberId;
     private final String email;
     private final @Nullable String password;
     private final String role;
 
-    public CustomeUserDetails(Member member) {
+    public CustomUserDetails(Member member) {
         this.memberId = member.getId();
         this.email = member.getEmail();
         this.password = member.getPassword();

@@ -4,10 +4,12 @@ import com.kimyanu.blog.config.AppConstant;
 import com.kimyanu.blog.dto.post.PostDto;
 import com.kimyanu.blog.dto.post.PostRequest;
 import com.kimyanu.blog.dto.post.PostResponse;
+import com.kimyanu.blog.security.CustomUserDetails;
 import com.kimyanu.blog.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,12 +18,6 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
 
     private final PostService postService;
-
-    @PostMapping("/public/posts")
-    public ResponseEntity<PostDto> createPost(@Valid @RequestBody PostRequest postRequest, @RequestParam("memberId") Long memberId) {
-        PostDto postDto = postService.createPost(postRequest, memberId);
-        return ResponseEntity.ok(postDto);
-    }
 
     @GetMapping("/public/posts")
     public ResponseEntity<PostResponse> getAllPosts(
@@ -42,22 +38,31 @@ public class PostController {
         return ResponseEntity.ok(post);
     }
 
-    //TODO: 스프링 시큐리티 도입 시 작성자 본인 확인 필요
-    @DeleteMapping("/public/posts/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
-
-        postService.deletePost(postId);
-
-        return ResponseEntity.noContent().build();
+    @PostMapping("/posts")
+    public ResponseEntity<PostDto> createPost(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody PostRequest postRequest) {
+        PostDto postDto = postService.createPost(postRequest, userDetails.getMemberId());
+        return ResponseEntity.ok(postDto);
     }
 
-    // TODO: 스프링 시큐리티 도입 후 작성자 본인 확인 로직 추가 필요
-    @PutMapping("/public/posts/{postId}")
-    public ResponseEntity<PostDto> updatePost(@PathVariable Long postId, @Valid @RequestBody PostRequest postRequest) {
+    @PutMapping("/posts/{postId}")
+    public ResponseEntity<PostDto> updatePost(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long postId,
+            @Valid @RequestBody PostRequest postRequest) {
 
-        PostDto updatedPost = postService.updatePost(postId, postRequest);
+        PostDto updatedPost = postService.updatePost(userDetails.getMemberId(),postId, postRequest);
 
         return ResponseEntity.ok(updatedPost);
+    }
+
+    @DeleteMapping("/posts/me/{postId}")
+    public ResponseEntity<Void> deletePost(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long postId) {
+
+        postService.deletePost(userDetails.getMemberId(), postId);
+
+        return ResponseEntity.noContent().build();
     }
 
 

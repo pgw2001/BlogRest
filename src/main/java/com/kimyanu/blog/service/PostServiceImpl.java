@@ -14,6 +14,7 @@ import com.kimyanu.blog.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,10 +79,15 @@ public class PostServiceImpl implements PostService{
 
     @Override
     @Transactional
-    public PostDto updatePost(Long postId, PostRequest postRequest) {
+    public PostDto updatePost(Long memberId, Long postId, PostRequest postRequest) {
 
         Post existingPost = postRepository.findWithMemberAndCategoryById(postId)
                 .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다 : " + postId));
+
+        // == Access Control: Only the author of the post can update it
+        if (!existingPost.getMember().getId().equals(memberId)) {
+            throw new AccessDeniedException("게시글 작성자만 수정할 수 있습니다.");
+        }
 
         if(postRequest.getCategoryId() != null && !postRequest.getCategoryId().equals(existingPost.getCategory().getId())) {
             Category category = categoryRepository.findById(postRequest.getCategoryId())
@@ -95,9 +101,10 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public void deletePost(Long postId) {
+    public void deletePost(Long memberId, Long postId) {
 
         Post existingPost = postRepository.findWithMemberAndCategoryById(postId)
+                .filter(post -> post.getMember().getId().equals(memberId))
                 .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다 : " + postId));
 
         postRepository.delete(existingPost);
