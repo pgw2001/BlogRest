@@ -1,12 +1,13 @@
 package com.kimyanu.blog.config;
 
 import com.kimyanu.blog.security.CustomUserDetailsService;
+import com.kimyanu.blog.security.JwtAuthenticationFilter;
+import com.kimyanu.blog.security.JwtProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -15,13 +16,16 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            JwtProvider jwtProvider) throws Exception {
         http
                 // URL 기반의 권한 설정
                 // .requestMatchers() : 특정 URL 패턴에 대한 권한 설정
@@ -36,11 +40,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")  // hasAuthority("ADMIN")도 사용가능한데 앞에 ROLE_ 지워야됨
                         .anyRequest().authenticated()
                 )
-                // 로그인 폼을 기본 설정으로 활성화(쓸 필요없음 세션 안쓰니까)
-//                .formLogin(Customizer.withDefaults())
-                // HTTP Basic 인증 방식을 기본 설정으로 활성화
-                // 이게 없으면 인증하는 방법이 없어서 인증 정보를 보내도 403 에러가 발생한다.
-                .httpBasic(Customizer.withDefaults())
 
                 // CSRF 보호 기능을 활성화 (<form action="">) 요청에 대해 CSRF 토큰을 검증하도록 설정
                 // 사용자 자신의 의지와 무관하게 공격자가 의도한 수정, 삭제, 등록 등(POST, PUT, DELETE)의 행위를 서버에 수행하게 만드는 공격을 의미
@@ -59,7 +58,9 @@ public class SecurityConfig {
                 // 이게 없으면 인증 없이 인증이 필요한 경로를 호출활 때 세선이 만들어지고, 401 응답에 JSESSIONID 쿠키가 내려온다.
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
+                )
+                // .addFilterBefore(filter, targetFilterClass) : 특정 필터를 다른 필터 앞에 추가
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

@@ -26,6 +26,13 @@ public class CustomUserDetails implements UserDetails {
         this.role = member.getRole().name();
     }
 
+    public CustomUserDetails(Long memberId, String email, String role) {
+        this.memberId = memberId;
+        this.email = email;
+        this.password = null;
+        this.role = role;
+    }
+
     @Override
     @NullMarked
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -40,6 +47,6 @@ public class CustomUserDetails implements UserDetails {
     @Override
     @NullMarked
     public String getUsername() {
-        return "";
+        return email;
     }
 }

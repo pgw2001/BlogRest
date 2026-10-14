@@ -1,5 +1,6 @@
 package com.kimyanu.blog.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,5 +34,13 @@ public class JwtProvider {
                 .expiration(expiration) // 토큰 만료 시간
                 .signWith(secretKey)    // 토큰 서명
                 .compact(); // JWT 토큰 생성
+    }
+
+    public Claims parseToken(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }
