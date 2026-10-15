@@ -3,8 +3,7 @@ package com.kimyanu.blog.mapper;
 import com.kimyanu.blog.dto.comment.CommentDto;
 import com.kimyanu.blog.dto.comment.CommentRequest;
 import com.kimyanu.blog.model.Comment;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -21,4 +20,11 @@ public interface CommentMapper {
     Comment toEntity(CommentRequest commentRequest);
 
     List<CommentDto> toDtoList(List<Comment> comments);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "post", ignore = true)
+    @Mapping(target = "member", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    void updateEntityFromRequest(@MappingTarget Comment existingComment, CommentRequest commentRequest);
 }

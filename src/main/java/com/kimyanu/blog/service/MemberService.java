@@ -4,7 +4,6 @@ import com.kimyanu.blog.dto.member.MemberPublicDto;
 import com.kimyanu.blog.dto.member.MemberRequest;
 import com.kimyanu.blog.dto.member.MemberResponse;
 import com.kimyanu.blog.dto.member.MemberUpdateRequest;
-import jakarta.validation.Valid;
 
 public interface MemberService {
     void createMember(MemberRequest memberRequest);
@@ -13,7 +12,7 @@ public interface MemberService {
 
     MemberPublicDto getMemberById(Long memberId);
 
-    MemberPublicDto updateMember(@Valid Long memberId, MemberUpdateRequest memberUpdateRequest);
+    MemberPublicDto updateMember(Long memberId, MemberUpdateRequest memberUpdateRequest);
 
     void deleteMember(Long memberId);
 }

@@ -1,37 +1,66 @@
 -- SAMPLE DATA:
-INSERT INTO category (id, name) VALUES (1, '개발일지');
-INSERT INTO category (id, name) VALUES (2, '자바/스프링');
-INSERT INTO category (id, name) VALUES (3, '리액트');
-INSERT INTO category (id, name) VALUES (4, '파이썬');
-INSERT INTO category (id, name) VALUES (5, '데이터베이스');
-INSERT INTO category (id, name) VALUES (6, '웹개발');
-INSERT INTO category (id, name) VALUES (7, '앱개발');
-INSERT INTO category (id, name) VALUES (8, '데브옵스');
-INSERT INTO category (id, name) VALUES (9, '알고리즘');
-INSERT INTO category (id, name) VALUES (10, 'CS지식');
-INSERT INTO category (id, name) VALUES (11, 'IT소식');
-INSERT INTO category (id, name) VALUES (12, '전자기기');
-INSERT INTO category (id, name) VALUES (13, '개발자일상');
-INSERT INTO category (id, name) VALUES (14, '커리어');
-INSERT INTO category (id, name) VALUES (15, '도서리뷰');
-INSERT INTO category (id, name) VALUES (16, '생산성');
-INSERT INTO category (id, name) VALUES (17, '블로그운영');
-INSERT INTO category (id, name) VALUES (18, '디자인');
-INSERT INTO category (id, name) VALUES (19, '비즈니스');
-INSERT INTO category (id, name) VALUES (20, '일상이야기');
-INSERT INTO category (id, name) VALUES (21, '맛집/카페');
-INSERT INTO category (id, name) VALUES (22, '여행');
-INSERT INTO category (id, name) VALUES (23, '자기계발');
-INSERT INTO category (id, name) VALUES (24, '재테크');
-INSERT INTO category (id, name) VALUES (25, '운동/건강');
-INSERT INTO category (id, name) VALUES (26, '취미생활');
-INSERT INTO category (id, name) VALUES (27, '영화리뷰');
-INSERT INTO category (id, name) VALUES (28, '게임');
-INSERT INTO category (id, name) VALUES (29, '질문답변');
-INSERT INTO category (id, name) VALUES (30, '공지사항');
+INSERT INTO category (id, name)
+VALUES (1, '개발일지');
+INSERT INTO category (id, name)
+VALUES (2, '자바/스프링');
+INSERT INTO category (id, name)
+VALUES (3, '리액트');
+INSERT INTO category (id, name)
+VALUES (4, '파이썬');
+INSERT INTO category (id, name)
+VALUES (5, '데이터베이스');
+INSERT INTO category (id, name)
+VALUES (6, '웹개발');
+INSERT INTO category (id, name)
+VALUES (7, '앱개발');
+INSERT INTO category (id, name)
+VALUES (8, '데브옵스');
+INSERT INTO category (id, name)
+VALUES (9, '알고리즘');
+INSERT INTO category (id, name)
+VALUES (10, 'CS지식');
+INSERT INTO category (id, name)
+VALUES (11, 'IT소식');
+INSERT INTO category (id, name)
+VALUES (12, '전자기기');
+INSERT INTO category (id, name)
+VALUES (13, '개발자일상');
+INSERT INTO category (id, name)
+VALUES (14, '커리어');
+INSERT INTO category (id, name)
+VALUES (15, '도서리뷰');
+INSERT INTO category (id, name)
+VALUES (16, '생산성');
+INSERT INTO category (id, name)
+VALUES (17, '블로그운영');
+INSERT INTO category (id, name)
+VALUES (18, '디자인');
+INSERT INTO category (id, name)
+VALUES (19, '비즈니스');
+INSERT INTO category (id, name)
+VALUES (20, '일상이야기');
+INSERT INTO category (id, name)
+VALUES (21, '맛집/카페');
+INSERT INTO category (id, name)
+VALUES (22, '여행');
+INSERT INTO category (id, name)
+VALUES (23, '자기계발');
+INSERT INTO category (id, name)
+VALUES (24, '재테크');
+INSERT INTO category (id, name)
+VALUES (25, '운동/건강');
+INSERT INTO category (id, name)
+VALUES (26, '취미생활');
+INSERT INTO category (id, name)
+VALUES (27, '영화리뷰');
+INSERT INTO category (id, name)
+VALUES (28, '게임');
+INSERT INTO category (id, name)
+VALUES (29, '질문답변');
+INSERT INTO category (id, name)
+VALUES (30, '공지사항');
 
-ALTER TABLE category ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM category);
-
+ALTER TABLE CATEGORY ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM CATEGORY);
 
 -- 회원 샘플 데이터
 INSERT INTO member (id, email, password, nickname, role, created_at)
@@ -56,7 +85,6 @@ INSERT INTO member (id, email, password, nickname, role, created_at)
 VALUES (9, 'han@test.com', '$2b$10$Rgf5Hf3UtE8I5e/aZS/yeuIurkzfIktNL2.EqM1VrmL.X6878.3IO', '한알고', 'USER', CURRENT_TIMESTAMP);
 INSERT INTO member (id, email, password, nickname, role, created_at)
 VALUES (10, 'oh@test.com', '$2b$10$9tniXIt9pNc6i2Km9Sc9xe84l8Fhkf/GVHLaBPdee7dkHAJsKmnpy', '오퍼블', 'USER', CURRENT_TIMESTAMP);
-
 
 -- 게시글 샘플 데이터 (is_visible = FALSE 2건 포함)
 INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
@@ -104,5 +132,28 @@ VALUES (21, 1, 1, '작성 중인 초안입니다', '아직 정리가 안 끝나�
 INSERT INTO post (id, member_id, category_id, title, content, is_visible, created_at)
 VALUES (22, 5, 17, '블로그 개편 계획 메모', '공개하기 전에 더 다듬어야 합니다.', FALSE, CURRENT_TIMESTAMP);
 
+-- 댓글 샘플 데이터
+INSERT INTO comment (id, post_id, member_id, content, created_at)
+VALUES (1, 1, 2, '좋은 글 감사합니다.', CURRENT_TIMESTAMP);
+INSERT INTO comment (id, post_id, member_id, content, created_at)
+VALUES (2, 1, 3, '저도 같은 부분에서 막혔었는데 도움이 됐습니다.', CURRENT_TIMESTAMP);
+INSERT INTO comment (id, post_id, member_id, content, created_at)
+VALUES (3, 1, 5, '다음 글도 기대할게요.', CURRENT_TIMESTAMP);
+INSERT INTO comment (id, post_id, member_id, content, created_at)
+VALUES (4, 2, 1, '설정 부분을 조금 더 자세히 알고 싶습니다.', CURRENT_TIMESTAMP);
+INSERT INTO comment (id, post_id, member_id, content, created_at)
+VALUES (5, 2, 4, '실무에서도 이렇게 쓰나요?', CURRENT_TIMESTAMP);
+INSERT INTO comment (id, post_id, member_id, content, created_at)
+VALUES (6, 3, 7, '정리가 깔끔해서 이해가 잘 됐습니다.', CURRENT_TIMESTAMP);
+INSERT INTO comment (id, post_id, member_id, content, created_at)
+VALUES (7, 5, 2, '예제 코드가 특히 좋았습니다.', CURRENT_TIMESTAMP);
+INSERT INTO comment (id, post_id, member_id, content, created_at)
+VALUES (8, 5, 9, '저장해두고 다시 읽어야겠어요.', CURRENT_TIMESTAMP);
+INSERT INTO comment (id, post_id, member_id, content, created_at)
+VALUES (9, 7, 1, '비슷한 경험이 있어서 공감됩니다.', CURRENT_TIMESTAMP);
+INSERT INTO comment (id, post_id, member_id, content, created_at)
+VALUES (10, 12, 3, '질문이 있는데 따로 남기겠습니다.', CURRENT_TIMESTAMP);
+
 ALTER TABLE MEMBER ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM MEMBER);
 ALTER TABLE POST ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM POST);
+ALTER TABLE COMMENT ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM COMMENT);

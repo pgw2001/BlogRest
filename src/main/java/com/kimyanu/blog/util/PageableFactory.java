@@ -13,11 +13,11 @@ public final class PageableFactory {
 
     }
 
-    public static @NonNull Pageable getPageable(Integer pageNumber,
-                                                Integer pageSize,
-                                                String sortBy,
-                                                String sortOrder,
-                                                List<String> sortableFields) {
+    public static @NonNull Pageable create(Integer pageNumber,
+                                           Integer pageSize,
+                                           String sortBy,
+                                           String sortOrder,
+                                           List<String> sortableFields) {
         if(pageNumber < 1 || pageSize < 1) {
             throw new IllegalArgumentException("pageNumber와 pageSize는 1 이상이어야 합니다.");
         }

@@ -13,4 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 public class CommentResponse {
     private List<CommentDto> content;
+    private Integer pageNumber;
+    private Integer pageSize;
+    private Long totalElements;
+    private Integer totalPage;
+    private Boolean isLast;
 }

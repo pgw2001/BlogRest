@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static com.kimyanu.blog.util.PageableFactory.getPageable;
+import static com.kimyanu.blog.util.PageableFactory.create;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +33,7 @@ public class MemberServiceImpl implements MemberService{
     public MemberResponse getAllMembers(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
 
-        Pageable pageable = getPageable(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
+        Pageable pageable = create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
 
         Page<Member> memberPage = memberRepository.findAll(pageable);
 

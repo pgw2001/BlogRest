@@ -11,6 +11,7 @@ import com.kimyanu.blog.model.Post;
 import com.kimyanu.blog.repository.CategoryRepository;
 import com.kimyanu.blog.repository.MemberRepository;
 import com.kimyanu.blog.repository.PostRepository;
+import com.kimyanu.blog.util.PageableFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-
-import static com.kimyanu.blog.util.PageableFactory.getPageable;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +34,7 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public PostResponse getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
-        Pageable pageDetails = getPageable(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
+        Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
         Page<Post> postPage = postRepository.findByIsVisibleTrue(pageDetails);
         List<Post> posts = postPage.getContent();
 
