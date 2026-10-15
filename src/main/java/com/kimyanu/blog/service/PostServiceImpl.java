@@ -3,6 +3,7 @@ package com.kimyanu.blog.service;
 import com.kimyanu.blog.dto.post.PostDto;
 import com.kimyanu.blog.dto.post.PostRequest;
 import com.kimyanu.blog.dto.post.PostResponse;
+import com.kimyanu.blog.dto.post.PostVisibilityRequest;
 import com.kimyanu.blog.exceptions.CategoryNotFoundException;
 import com.kimyanu.blog.mapper.PostMapper;
 import com.kimyanu.blog.model.Category;
@@ -118,6 +119,17 @@ public class PostServiceImpl implements PostService{
 
         postMapper.updateEntityFromRequest(existingPost, postRequest);
 
+        return postMapper.toDto(existingPost);
+    }
+
+    @Override
+    public PostDto updatePostVisibility(Long postId, PostVisibilityRequest postVisibilityRequest) {
+
+        Post existingPost = postRepository.findById(postId)
+                .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다. " + postId));
+
+
+        existingPost.setIsVisible(postVisibilityRequest.getIsVisible());
         return postMapper.toDto(existingPost);
     }
 

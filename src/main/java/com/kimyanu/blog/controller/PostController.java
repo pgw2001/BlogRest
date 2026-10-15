@@ -4,12 +4,14 @@ import com.kimyanu.blog.config.AppConstant;
 import com.kimyanu.blog.dto.post.PostDto;
 import com.kimyanu.blog.dto.post.PostRequest;
 import com.kimyanu.blog.dto.post.PostResponse;
+import com.kimyanu.blog.dto.post.PostVisibilityRequest;
 import com.kimyanu.blog.security.CustomUserDetails;
 import com.kimyanu.blog.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -38,8 +40,6 @@ public class PostController {
         return ResponseEntity.ok(post);
     }
 
-    // TODO: 내 게시글만 조회하는 API를 만들어야 한다. (인증 필요)
-    // TODO: GET /api/members/me/posts, PostResponse 반환, 공개/비공개 상관하지 않고 모두 조회
     @GetMapping("/members/me/posts")
     public ResponseEntity<PostResponse> getMyPosts(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -70,6 +70,21 @@ public class PostController {
         PostDto updatedPost = postService.updatePost(userDetails.getMemberId(),postId, postRequest);
 
         return ResponseEntity.ok(updatedPost);
+    }
+
+    // TODO: 게시글의 공개/비공개 여부를 변경하는 API
+    // TODO: Put "/admin/posts/{postId}/visibility
+    // TODO: PostVisibilityRequest 생성해서 isVisible 필드만 받도록 함, 이 값에 의해서 게시글의 공개/비공개 여부를 변경
+    // TODO: PostResponse 응답
+    @PutMapping("/admin/posts/{postId}/visibility")
+    @Transactional
+    public ResponseEntity<PostDto> updatePostVisibility(
+            @PathVariable Long postId,
+            @Valid @RequestBody PostVisibilityRequest postVisibilityRequest) {
+
+        PostDto response = postService.updatePostVisibility(postId, postVisibilityRequest);
+
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/posts/me/{postId}")
