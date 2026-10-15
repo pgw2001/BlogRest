@@ -38,6 +38,21 @@ public class PostController {
         return ResponseEntity.ok(post);
     }
 
+    // TODO: 내 게시글만 조회하는 API를 만들어야 한다. (인증 필요)
+    // TODO: GET /api/members/me/posts, PostResponse 반환, 공개/비공개 상관하지 않고 모두 조회
+    @GetMapping("/members/me/posts")
+    public ResponseEntity<PostResponse> getMyPosts(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam (value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
+            @RequestParam (value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
+            @RequestParam (value = "sortBy", defaultValue = AppConstant.SORT_POST_BY) String sortBy,
+            @RequestParam (value = "sortOrder", defaultValue = AppConstant.SORT_POST_ASC) String sortOrder) {
+
+        PostResponse myPosts = postService.getMyPosts(userDetails.getMemberId(), pageNumber, pageSize, sortBy, sortOrder);
+
+        return ResponseEntity.ok(myPosts);
+    }
+
     @PostMapping("/posts")
     public ResponseEntity<PostDto> createPost(
             @AuthenticationPrincipal CustomUserDetails userDetails,

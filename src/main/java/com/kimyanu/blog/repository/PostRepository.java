@@ -32,4 +32,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Modifying
     @Query("UPDATE Post p SET p.isVisible = false WHERE p.member.id = :memberId")
     void hideAllByMemberId(Long memberId);
+
+    @EntityGraph(attributePaths = {"member", "category"})
+    Page<Post> findByMemberId(Long memberId, Pageable pageDetails);
 }

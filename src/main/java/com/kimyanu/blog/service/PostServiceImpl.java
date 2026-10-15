@@ -27,6 +27,7 @@ import java.util.NoSuchElementException;
 public class PostServiceImpl implements PostService{
 
     private final List<String> SORTABLE_FIELDS = List.of("id", "title", "content", "createdAt");
+    private final List<String> SORTABLE_MY_FIELDS = List.of("id", "title", "content", "createdAt", "isVisible");
     private final PostRepository postRepository;
     private final PostMapper postMapper;
     private final MemberRepository memberRepository;
@@ -56,6 +57,27 @@ public class PostServiceImpl implements PostService{
                 .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다 : " + postId));
 
         return postMapper.toDto(post);
+    }
+
+    @Override
+    public PostResponse getMyPosts(Long memberId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+
+//        Member member = memberRepository.findById(memberId)
+//                .orElseThrow(() -> new NoSuchElementException("회원이 존재하지 않습니다." + memberId));
+
+
+        Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
+        Page<Post> postPage = postRepository.findByMemberId(memberId, pageDetails);
+        List<Post> posts = postPage.getContent();
+
+        return new PostResponse(
+                postMapper.toDtoList(posts),
+                postPage.getNumber() + 1,
+                postPage.getSize(),
+                postPage.getTotalElements(),
+                postPage.getTotalPages(),
+                postPage.isLast()
+        );
     }
 
     @Override
