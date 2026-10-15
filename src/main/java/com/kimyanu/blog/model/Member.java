@@ -37,6 +37,8 @@ public class Member {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    private LocalDateTime deletedAt;
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();

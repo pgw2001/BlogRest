@@ -54,6 +54,10 @@ public class MemberController {
     }
 
     // TODO: 물리 삭제 - 게시글/댓글 추가 후 논리 삭제로 전환
+    // TODO: 물리 삭제 -> 논리 삭제로 전환, 이메일, 닉네임은 개인정보 법에 의거하여 즉시 파기해야 함
+    // TODO: 회원 탈퇴 시 게시글/댓글은 남기고, 회원 정보는 삭제(닉네임, 이메일 등) 탈퇴 시점에 "탈퇴한회원_{memberId}"로 변경, 이메일은 "탈퇴한
+    // TODO: 이메일은 "deleted_{memberId}.@deleted.local"로 변경, 비밀번호는 null로 변경.
+    // TODO: 탈퇴한 회원은 회원 목록에서 조회되지 않도록 처리
     @DeleteMapping("/members/me")
     public ResponseEntity<Void> deleteMember(@AuthenticationPrincipal CustomUserDetails userDetails) {
         memberService.deleteMember(userDetails.getMemberId());

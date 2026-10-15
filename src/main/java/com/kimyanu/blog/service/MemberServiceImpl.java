@@ -8,6 +8,7 @@ import com.kimyanu.blog.enums.UserRole;
 import com.kimyanu.blog.mapper.MemberMapper;
 import com.kimyanu.blog.model.Member;
 import com.kimyanu.blog.repository.MemberRepository;
+import com.kimyanu.blog.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -24,18 +26,24 @@ import static com.kimyanu.blog.util.PageableFactory.create;
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService{
 
-    private final List<String> SORTABLE_FIELDS = List.of("id", "nickname", "email", "createdAt");
+    private static final List<String> SORTABLE_FIELDS = List.of("id", "nickname", "email", "createdAt");
+    private static final String DELETED_NICKNAME_SUFFIX = "탈퇴한회원_";
+    private static final String DELETED_EMAIL_SUFFIX = "deleted_";
+    private static final String DELETED_EMAIL_DOMAIN = "@deleted.local";
+
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
     private final PasswordEncoder passwordEncoder;
+    private final PostRepository postRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public MemberResponse getAllMembers(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
 
         Pageable pageable = create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
 
-        Page<Member> memberPage = memberRepository.findAll(pageable);
+        Page<Member> memberPage = memberRepository.findAllByDeletedAtNull(pageable);
 
         List<Member> members = memberPage.getContent();
 
@@ -101,18 +109,26 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
+    @Transactional
     public void deleteMember(Long memberId) {
-        // 1. 객체 저장 후 delete로 삭제
+
+        // 1. 회원 존재 여부 확인 및 정보 저장
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NoSuchElementException("해당 ID의 회원을 잧을 수 없습니다. : " + memberId));
-        memberRepository.delete(member);
+                .orElseThrow(() -> new NoSuchElementException("해당 ID의 회원을 찾을 수 없습니다. : " + memberId));
 
-        // 2. id 존재 확인 후 deleteById로 삭제
-//        boolean existingMember = memberRepository.existsById(memberId);
-//        if(!existingMember) {
-//            throw new NoSuchElementException("해당 ID의 회원을 찾을 수 없습니다. : " + memberId);
-//        }
-//        memberRepository.deleteById(memberId);
+        // 2. 탈퇴 일자 설정
+        member.setDeletedAt(LocalDateTime.now());
+
+        // 닉네임은 개인정보는 아니지만 사이트 정책에 의거하여 남기지 않는다.
+        member.setNickname(DELETED_NICKNAME_SUFFIX + memberId);
+
+        // 이메일은 개인정보이므로 즉시 파기한다.
+        member.setEmail(DELETED_EMAIL_SUFFIX + memberId + DELETED_EMAIL_DOMAIN);
+
+
+        // 게시글은 삭제하지는 않지만, 모두 비공개 처리한다.
+        postRepository.hideAllByMemberId(memberId);
+
+        member.setPassword(null);
     }
-
 }
