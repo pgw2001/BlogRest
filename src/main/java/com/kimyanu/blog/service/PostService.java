@@ -19,4 +19,6 @@ public interface PostService {
     void deletePost(Long memberId, Long postId);
 
     PostDto updatePostVisibility(Long postId, PostVisibilityRequest postVisibilityRequest);
+
+    PostResponse getAllPostsForAdmin(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 }

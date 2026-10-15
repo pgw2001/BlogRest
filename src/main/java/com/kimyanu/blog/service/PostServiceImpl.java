@@ -51,6 +51,22 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
+    public PostResponse getAllPostsForAdmin(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
+        Page<Post> postPage = postRepository.findAllBy(pageDetails);
+        List<Post> posts = postPage.getContent();
+
+        return new PostResponse(
+                postMapper.toDtoList(posts),
+                postPage.getNumber() + 1,
+                postPage.getSize(),
+                postPage.getTotalElements(),
+                postPage.getTotalPages(),
+                postPage.isLast()
+        );
+    }
+
+    @Override
     public PostDto getPostById(Long postId) {
 
         Post post = postRepository.findWithMemberAndCategoryById(postId)

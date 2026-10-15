@@ -32,6 +32,17 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
+    @GetMapping("/admin/posts")
+    public ResponseEntity<PostResponse> getAllPostsForAdmin(
+            @RequestParam (value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
+            @RequestParam (value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
+            @RequestParam (value = "sortBy", defaultValue = AppConstant.SORT_POST_BY) String sortBy,
+            @RequestParam (value = "sortOrder", defaultValue = AppConstant.SORT_POST_ASC) String sortOrder
+    ) {
+        PostResponse posts = postService.getAllPostsForAdmin(pageNumber, pageSize, sortBy, sortOrder);
+        return ResponseEntity.ok(posts);
+    }
+
     @GetMapping("/public/posts/{postId}")
     public ResponseEntity<PostDto> getPostById(@PathVariable Long postId) {
 
@@ -72,10 +83,6 @@ public class PostController {
         return ResponseEntity.ok(updatedPost);
     }
 
-    // TODO: 게시글의 공개/비공개 여부를 변경하는 API
-    // TODO: Put "/admin/posts/{postId}/visibility
-    // TODO: PostVisibilityRequest 생성해서 isVisible 필드만 받도록 함, 이 값에 의해서 게시글의 공개/비공개 여부를 변경
-    // TODO: PostResponse 응답
     @PutMapping("/admin/posts/{postId}/visibility")
     @Transactional
     public ResponseEntity<PostDto> updatePostVisibility(
