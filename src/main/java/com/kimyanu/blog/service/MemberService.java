@@ -4,15 +4,126 @@ import com.kimyanu.blog.dto.member.MemberPublicDto;
 import com.kimyanu.blog.dto.member.MemberRequest;
 import com.kimyanu.blog.dto.member.MemberResponse;
 import com.kimyanu.blog.dto.member.MemberUpdateRequest;
+import com.kimyanu.blog.enums.UserRole;
+import com.kimyanu.blog.mapper.MemberMapper;
+import com.kimyanu.blog.model.Member;
+import com.kimyanu.blog.repository.MemberRepository;
+import com.kimyanu.blog.repository.PostRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-public interface MemberService {
-    void createMember(MemberRequest memberRequest);
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.NoSuchElementException;
 
-    MemberResponse getAllMembers(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+import static com.kimyanu.blog.util.PageableFactory.create;
 
-    MemberPublicDto getMemberById(Long memberId);
+@Service
+@RequiredArgsConstructor
+public class MemberService{
 
-    MemberPublicDto updateMember(Long memberId, MemberUpdateRequest memberUpdateRequest);
+    private static final List<String> SORTABLE_FIELDS = List.of("id", "nickname", "email", "createdAt");
+    private static final String DELETED_NICKNAME_SUFFIX = "탈퇴한회원_";
+    private static final String DELETED_EMAIL_SUFFIX = "deleted_";
+    private static final String DELETED_EMAIL_DOMAIN = "@deleted.local";
 
-    void deleteMember(Long memberId);
+    private final MemberRepository memberRepository;
+    private final MemberMapper memberMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final PostRepository postRepository;
+
+    @Transactional(readOnly = true)
+    public MemberResponse getAllMembers(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+
+
+        Pageable pageable = create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
+
+        Page<Member> memberPage = memberRepository.findAllByDeletedAtNull(pageable);
+
+        List<Member> members = memberPage.getContent();
+
+
+        return new MemberResponse(
+                memberMapper.toDtoList(members),
+                memberPage.getNumber() + 1,
+                memberPage.getSize(),
+                memberPage.getTotalElements(),
+                memberPage.getTotalPages(),
+                memberPage.isLast()
+        );
+    }
+
+    public MemberPublicDto getMemberById(Long memberId) {
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException("해당 id의 회원을 찾을 수 없습니다. : " + memberId));
+
+        return memberMapper.toPublicDto(member);
+    }
+
+    @Transactional
+    public void createMember(MemberRequest memberRequest) {
+        if(memberRepository.existsByEmail(memberRequest.getEmail())) {
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다: " + memberRequest.getEmail());
+        }
+
+        if(memberRepository.existsByNickname(memberRequest.getNickname())) {
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다: " + memberRequest.getNickname());
+        }
+
+        Member memberEntity = memberMapper.toEntity(memberRequest);
+        memberEntity.setRole(UserRole.USER);
+        memberEntity.setPassword(passwordEncoder.encode(memberRequest.getPassword()));
+        memberRepository.save(memberEntity);
+    }
+
+    @Transactional
+    public MemberPublicDto updateMember(Long memberId, MemberUpdateRequest memberUpdateRequest) {
+        // 가져오기
+        Member existingMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException("해당 id의 회원을 찾을 수 없습니다. : " + memberId));
+
+        // 닉네임 변경 사항 처리 (null이 아닌 경우에만 업데이트)
+        String newNickname = memberUpdateRequest.getNickname();
+        if (newNickname != null && !newNickname.isBlank()) {
+            boolean nicknameChanged = !existingMember.getNickname().equals(newNickname);
+            if (nicknameChanged && memberRepository.existsByNickname(newNickname)) {
+                throw new IllegalStateException("이미 사용 중인 닉네임입니다: " + newNickname);
+            }
+            existingMember.setNickname(newNickname);
+        }
+
+        // 비밀번호 변경 사항 처리
+        if (memberUpdateRequest.getPassword() != null) {
+            existingMember.setPassword(passwordEncoder.encode(memberUpdateRequest.getPassword()));
+        }
+        return memberMapper.toPublicDto(existingMember);
+    }
+
+    @Transactional
+    public void deleteMember(Long memberId) {
+
+        // 1. 회원 존재 여부 확인 및 정보 저장
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException("해당 ID의 회원을 찾을 수 없습니다. : " + memberId));
+
+        // 2. 탈퇴 일자 설정
+        member.setDeletedAt(LocalDateTime.now());
+
+        // 닉네임은 개인정보는 아니지만 사이트 정책에 의거하여 남기지 않는다.
+        member.setNickname(DELETED_NICKNAME_SUFFIX + memberId);
+
+        // 이메일은 개인정보이므로 즉시 파기한다.
+        member.setEmail(DELETED_EMAIL_SUFFIX + memberId + DELETED_EMAIL_DOMAIN);
+
+
+        // 게시글은 삭제하지는 않지만, 모두 비공개 처리한다.
+        postRepository.hideAllByMemberId(memberId);
+
+        member.setPassword(null);
+    }
 }
