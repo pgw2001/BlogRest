@@ -3,7 +3,8 @@ package com.kimyanu.blog.service;
 import com.kimyanu.blog.dto.category.CategoryDto;
 import com.kimyanu.blog.dto.category.CategoryRequest;
 import com.kimyanu.blog.dto.category.CategoryResponse;
-import com.kimyanu.blog.exceptions.CategoryNotFoundException;
+import com.kimyanu.blog.exceptions.custom.CategoryNotFoundException;
+import com.kimyanu.blog.exceptions.custom.DuplicateCategoryException;
 import com.kimyanu.blog.mapper.CategoryMapper;
 import com.kimyanu.blog.model.Category;
 import com.kimyanu.blog.repository.CategoryRepository;
@@ -56,10 +57,10 @@ public class CategoryService {
 
     @Transactional
     public CategoryDto createCategory(CategoryRequest categoryRequest) {
-        boolean duplicate = categoryRepository.existsByName(categoryRequest.getName());
+        boolean duplicate = categoryRepository.existsByNameIgnoreCase(categoryRequest.getName());
 
         if(duplicate) {
-            throw new IllegalStateException("이미 존재하는 카테고리입니다: " + categoryRequest.getName());
+            throw new DuplicateCategoryException();
         }
 
         // Request DTO를 엔티티로 변환하고 저장 (DTO -> Entity)
@@ -75,7 +76,7 @@ public class CategoryService {
                 .findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
-        boolean duplicate = categoryRepository.existsByNameAndIdNot(categoryRequest.getName(), categoryId);
+        boolean duplicate = categoryRepository.existsByNameIgnoreCaseAndIdNot(categoryRequest.getName(), categoryId);
 
         /*
         boolean nameChanged = !existCategory.getName().equals(categoryRequest.getName());
@@ -101,10 +102,10 @@ public class CategoryService {
         // findById + 예외 + delete() : 존재 여부를 확인하고, 존재하지 않으면 예외 처리까지 하면서 삭제할 때.
         Category category = categoryRepository
                 .findById(categoryId)
-                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+                .orElseThrow(CategoryNotFoundException::new);
 
         categoryRepository.delete(category);
-        // categoryRepository.deleteById(category);
+//         categoryRepository.deleteById(category);
         return categoryMapper.toDto(category);
     }
 }

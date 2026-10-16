@@ -5,11 +5,15 @@ import com.kimyanu.blog.dto.member.MemberRequest;
 import com.kimyanu.blog.dto.member.MemberResponse;
 import com.kimyanu.blog.dto.member.MemberUpdateRequest;
 import com.kimyanu.blog.enums.UserRole;
+import com.kimyanu.blog.exceptions.custom.DuplicateMemberException;
+import com.kimyanu.blog.exceptions.custom.MemberNotFoundException;
+import com.kimyanu.blog.exceptions.custom.ReservedMemberValueException;
 import com.kimyanu.blog.mapper.MemberMapper;
 import com.kimyanu.blog.model.Member;
 import com.kimyanu.blog.repository.MemberRepository;
 import com.kimyanu.blog.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static com.kimyanu.blog.util.PageableFactory.create;
 
@@ -59,20 +62,23 @@ public class MemberService{
 
     public MemberPublicDto getMemberById(Long memberId) {
 
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NoSuchElementException("해당 id의 회원을 찾을 수 없습니다. : " + memberId));
+        Member member = findExistingMember(memberId);
 
         return memberMapper.toPublicDto(member);
     }
 
     @Transactional
     public void createMember(MemberRequest memberRequest) {
+
+        ensureNotReservedNickname(memberRequest.getNickname());
+        ensureNotReservedEmail(memberRequest.getEmail());
+
         if(memberRepository.existsByEmail(memberRequest.getEmail())) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다: " + memberRequest.getEmail());
+            throw DuplicateMemberException.duplicateEmail();
         }
 
-        if(memberRepository.existsByNickname(memberRequest.getNickname())) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다: " + memberRequest.getNickname());
+        if(memberRepository.existsByNicknameIgnoreCase(memberRequest.getNickname())) {
+            throw DuplicateMemberException.duplicateNickname();
         }
 
         Member memberEntity = memberMapper.toEntity(memberRequest);
@@ -84,15 +90,17 @@ public class MemberService{
     @Transactional
     public MemberPublicDto updateMember(Long memberId, MemberUpdateRequest memberUpdateRequest) {
         // 가져오기
-        Member existingMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NoSuchElementException("해당 id의 회원을 찾을 수 없습니다. : " + memberId));
+        Member existingMember = findExistingMember(memberId);
 
         // 닉네임 변경 사항 처리 (null이 아닌 경우에만 업데이트)
         String newNickname = memberUpdateRequest.getNickname();
+
         if (newNickname != null && !newNickname.isBlank()) {
-            boolean nicknameChanged = !existingMember.getNickname().equals(newNickname);
-            if (nicknameChanged && memberRepository.existsByNickname(newNickname)) {
-                throw new IllegalStateException("이미 사용 중인 닉네임입니다: " + newNickname);
+            ensureNotReservedNickname(newNickname);
+            boolean nicknameChanged = !existingMember.getNickname().equalsIgnoreCase(newNickname);
+
+            if (nicknameChanged && memberRepository.existsByNicknameIgnoreCase(newNickname)) {
+                throw DuplicateMemberException.duplicateNickname();
             }
             existingMember.setNickname(newNickname);
         }
@@ -108,8 +116,7 @@ public class MemberService{
     public void deleteMember(Long memberId) {
 
         // 1. 회원 존재 여부 확인 및 정보 저장
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NoSuchElementException("해당 ID의 회원을 찾을 수 없습니다. : " + memberId));
+        Member member = findExistingMember(memberId);
 
         // 2. 탈퇴 일자 설정
         member.setDeletedAt(LocalDateTime.now());
@@ -125,5 +132,22 @@ public class MemberService{
         postRepository.hideAllByMemberId(memberId);
 
         member.setPassword(null);
+    }
+
+    private @NonNull Member findExistingMember(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(MemberNotFoundException::new);
+    }
+
+    private static void ensureNotReservedNickname(String nickname) {
+        if(nickname.startsWith(DELETED_NICKNAME_SUFFIX)) {
+            throw ReservedMemberValueException.invalidNickname();
+        }
+    }
+
+    private static void ensureNotReservedEmail(String email) {
+        if(email.endsWith(DELETED_EMAIL_DOMAIN)) {
+            throw ReservedMemberValueException.invalidEmail();
+        }
     }
 }

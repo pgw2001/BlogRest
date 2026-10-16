@@ -2,11 +2,11 @@ package com.kimyanu.blog.exceptions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.util.List;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public record ErrorResponse(String errorMessage, boolean status, List<String> errors) {
-    public ErrorResponse(String errorMessage, boolean status) {
-        this(errorMessage, status, null);
+public record ErrorResponse(String errorMessage, Map<String, String> errors) {
+    public ErrorResponse(String errorMessage) {
+        this(errorMessage, Map.of());
     }
 }

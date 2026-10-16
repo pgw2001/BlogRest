@@ -3,6 +3,9 @@ package com.kimyanu.blog.service;
 import com.kimyanu.blog.dto.comment.CommentDto;
 import com.kimyanu.blog.dto.comment.CommentRequest;
 import com.kimyanu.blog.dto.comment.CommentResponse;
+import com.kimyanu.blog.exceptions.custom.CommentNotFoundException;
+import com.kimyanu.blog.exceptions.custom.MemberNotFoundException;
+import com.kimyanu.blog.exceptions.custom.PostNotFoundException;
 import com.kimyanu.blog.mapper.CommentMapper;
 import com.kimyanu.blog.model.Comment;
 import com.kimyanu.blog.model.Member;
@@ -60,10 +63,10 @@ public class CommentService{
     public CommentDto createComment(Long memberId, Long postId, CommentRequest commentRequest) {
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다." + postId));
+                .orElseThrow(PostNotFoundException::new);
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NoSuchElementException("회원이 존재하지 않습니다." + memberId));
+                .orElseThrow(MemberNotFoundException::new);
 
         Comment comment = commentMapper.toEntity(commentRequest);
         comment.setPost(post);
@@ -77,7 +80,7 @@ public class CommentService{
     public CommentDto updateComment(Long memberId, Long commentId, CommentRequest commentRequest) {
 
         Comment existingComment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NoSuchElementException("댓글이 존재하지 않습니다. " + commentId));
+                .orElseThrow(CommentNotFoundException::new);
 
         // == Access Control: Only the author of the post can update it
         if (!existingComment.getMember().getId().equals(memberId)) {
@@ -96,7 +99,7 @@ public class CommentService{
     public void deleteComment(Long memberId, Long commentId) {
 
         Comment existingComment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NoSuchElementException("댓글이 존재하지 않습니다 : " + commentId));
+                .orElseThrow(CommentNotFoundException::new);
 
         // == Access Control: Only the author of the post can update it
         if (!existingComment.getMember().getId().equals(memberId)) {

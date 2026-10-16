@@ -1,4 +1,4 @@
-package com.kimyanu.blog.exceptions;
+package com.kimyanu.blog.exceptions.custom;
 
 import lombok.Getter;
 
@@ -25,11 +25,16 @@ import lombok.Getter;
  */
 
 @Getter
-public class CategoryNotFoundException extends RuntimeException {
-    private final Long categoryId;
+public final class CategoryNotFoundException extends RuntimeException {
+    private Long categoryId;
+
+    public CategoryNotFoundException() {
+        super("카테고리를 찾을 수 없습니다.");
+    }
 
     public CategoryNotFoundException(Long categoryId) {
         super(String.format("ID가 %s인 카테고리를 찾을 수 없습니다.", categoryId));
         this.categoryId = categoryId;
     }
 }
+

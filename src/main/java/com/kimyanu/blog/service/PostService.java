@@ -4,7 +4,9 @@ import com.kimyanu.blog.dto.post.PostDto;
 import com.kimyanu.blog.dto.post.PostRequest;
 import com.kimyanu.blog.dto.post.PostResponse;
 import com.kimyanu.blog.dto.post.PostVisibilityRequest;
-import com.kimyanu.blog.exceptions.CategoryNotFoundException;
+import com.kimyanu.blog.exceptions.custom.CategoryNotFoundException;
+import com.kimyanu.blog.exceptions.custom.MemberNotFoundException;
+import com.kimyanu.blog.exceptions.custom.PostNotFoundException;
 import com.kimyanu.blog.mapper.PostMapper;
 import com.kimyanu.blog.model.Category;
 import com.kimyanu.blog.model.Member;
@@ -68,7 +70,7 @@ public class PostService{
 
         Post post = postRepository.findWithMemberAndCategoryById(postId)
                 .filter(Post::getIsVisible)
-                .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다 : " + postId));
+                .orElseThrow(PostNotFoundException::new);
 
         return postMapper.toDto(post);
     }
@@ -97,10 +99,10 @@ public class PostService{
     public PostDto createPost(PostRequest postRequest, Long memberId) {
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NoSuchElementException("해당 ID의 회원을 찾을 수 없습니다. : " + memberId));
+                .orElseThrow(MemberNotFoundException::new);
 
         Category category = categoryRepository.findById(postRequest.getCategoryId())
-                .orElseThrow(() -> new CategoryNotFoundException(postRequest.getCategoryId()));
+                .orElseThrow(CategoryNotFoundException::new);
 
         Post postEntity = postMapper.toEntity(postRequest);
         postEntity.setMember(member);

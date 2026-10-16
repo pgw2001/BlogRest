@@ -14,11 +14,11 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsByEmail(@NotBlank(message = "이메일은 필수입니다.") @Email(message = "이메일 형식이 올바르지 않습니다.") String email);
 
-    boolean existsByNickname(@NotBlank(message = "닉네임은 필수입니다.") String nickname);
-
     Optional<Member> findByEmail(String email);
 
     Page<Member> findAllByDeletedAtNull(Pageable pageable);
 
     Optional<Member> findByIdAndDeletedAtIsNull(Long memberId);
+
+    boolean existsByNicknameIgnoreCase(String newNickname);
 }
