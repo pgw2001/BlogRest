@@ -1,8 +1,6 @@
 package com.kimyanu.blog.config;
 
-import com.kimyanu.blog.security.CustomUserDetailsService;
-import com.kimyanu.blog.security.JwtAuthenticationFilter;
-import com.kimyanu.blog.security.JwtProvider;
+import com.kimyanu.blog.security.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +23,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
+            CustomAuthenticationEntryPoint authenticationEntryPoint,
+            CustomAccessDeniedHandler accessDeniedHandler,
             JwtProvider jwtProvider) throws Exception {
         http
                 // URL 기반의 권한 설정
@@ -58,6 +58,11 @@ public class SecurityConfig {
                 // 이게 없으면 인증 없이 인증이 필요한 경로를 호출활 때 세선이 만들어지고, 401 응답에 JSESSIONID 쿠키가 내려온다.
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
                 )
                 // .addFilterBefore(filter, targetFilterClass) : 특정 필터를 다른 필터 앞에 추가
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
