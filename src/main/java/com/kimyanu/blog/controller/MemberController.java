@@ -2,8 +2,8 @@ package com.kimyanu.blog.controller;
 
 import com.kimyanu.blog.config.AppConstant;
 import com.kimyanu.blog.dto.common.PageResponse;
+import com.kimyanu.blog.dto.member.MemberCreateRequest;
 import com.kimyanu.blog.dto.member.MemberPublicResponse;
-import com.kimyanu.blog.dto.member.MemberRequest;
 import com.kimyanu.blog.dto.member.MemberResponse;
 import com.kimyanu.blog.dto.member.MemberUpdateRequest;
 import com.kimyanu.blog.security.CustomUserDetails;
@@ -41,8 +41,8 @@ public class MemberController {
     }
 
     @PostMapping("/public/members")
-    public ResponseEntity<Void> createMember(@Valid @RequestBody MemberRequest memberRequest) {
-        memberService.createMember(memberRequest);
+    public ResponseEntity<Void> createMember(@Valid @RequestBody MemberCreateRequest memberCreateRequest) {
+        memberService.createMember(memberCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

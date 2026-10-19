@@ -1,6 +1,7 @@
 package com.kimyanu.blog.exceptions;
 
 import com.kimyanu.blog.exceptions.custom.*;
+import org.hibernate.LazyInitializationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -134,6 +135,11 @@ public class GlobalExecutionHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoResourceFoundException() {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("요청한 경로를 찾을 수 없습니다."));
+    }
+
+    @ExceptionHandler(LazyInitializationException.class)
+    public ResponseEntity<ErrorResponse> handleLazyInitializationException() {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("영속성 컨텍스트가 닫혀서 LAZY 연관을 읽을 수 없습니다. OSIV 설정을 확인하세요."));
     }
 
 

@@ -1,5 +1,6 @@
 package com.kimyanu.blog.dto.common;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonPropertyOrder({"content", "pageNumber", "pageSize", "totalElements", "totalPage", "LastPage"})
 public class PageResponse<T> {
     private List<T> content;
     private Integer pageNumber;

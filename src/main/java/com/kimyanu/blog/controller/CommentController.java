@@ -44,9 +44,9 @@ public class CommentController {
             @PathVariable Long postId,
             @Valid @RequestBody CommentRequest commentRequest) {
 
-        CommentResponse commentDto = commentService.createComment(userDetails.getMemberId(), postId, commentRequest);
+        CommentResponse commentResponse = commentService.createComment(userDetails.getMemberId(), postId, commentRequest);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentResponse);
     }
 
     @PutMapping("/comments/{commentId}")

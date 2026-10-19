@@ -45,7 +45,7 @@ public class CategoryService {
         List<Category> categories =  categoryPage.getContent();
 
         // 엔티티를 DTO로 변환하여 반환 (Entity -> DTO)
-        return PageResponse.of(categoryPage, categoryMapper.toDtoList(categories));
+        return PageResponse.of(categoryPage, categoryMapper.toResponseList(categories));
     }
 
     @Transactional
@@ -59,7 +59,7 @@ public class CategoryService {
         // Request DTO를 엔티티로 변환하고 저장 (DTO -> Entity)
         Category categoryEntity = categoryMapper.toEntity(categoryRequest);
         Category savedCategory = categoryRepository.save(categoryEntity);
-        return categoryMapper.toDto(savedCategory);
+        return categoryMapper.toResponse(savedCategory);
     }
 
     @Transactional
@@ -83,7 +83,7 @@ public class CategoryService {
         }
 
         existCategory.setName(categoryRequest.getName());
-        return categoryMapper.toDto(existCategory);
+        return categoryMapper.toResponse(existCategory);
     }
 
     @Transactional
@@ -99,6 +99,6 @@ public class CategoryService {
 
         categoryRepository.delete(category);
 //         categoryRepository.deleteById(category);
-        return categoryMapper.toDto(category);
+        return categoryMapper.toResponse(category);
     }
 }

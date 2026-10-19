@@ -15,7 +15,7 @@ public interface CategoryMapper {
     Category toEntity(CategoryRequest categoryRequest);
 
     // Entity -> DTO
-    List<CategoryResponse> toDtoList(List<Category> categories);
+    List<CategoryResponse> toResponseList(List<Category> categories);
 
-    CategoryResponse toDto(Category savedCategory);
+    CategoryResponse toResponse(Category savedCategory);
 }

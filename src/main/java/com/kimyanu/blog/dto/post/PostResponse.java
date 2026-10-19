@@ -1,5 +1,6 @@
 package com.kimyanu.blog.dto.post;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@JsonPropertyOrder({"id", "title", "content", "thumbnail", "isVisible", "createdAt"})
 public class PostResponse {
     private Long id;
     private String title;

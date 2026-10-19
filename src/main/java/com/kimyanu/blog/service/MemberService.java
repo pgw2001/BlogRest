@@ -1,8 +1,8 @@
 package com.kimyanu.blog.service;
 
 import com.kimyanu.blog.dto.common.PageResponse;
+import com.kimyanu.blog.dto.member.MemberCreateRequest;
 import com.kimyanu.blog.dto.member.MemberPublicResponse;
-import com.kimyanu.blog.dto.member.MemberRequest;
 import com.kimyanu.blog.dto.member.MemberResponse;
 import com.kimyanu.blog.dto.member.MemberUpdateRequest;
 import com.kimyanu.blog.enums.UserRole;
@@ -51,33 +51,33 @@ public class MemberService{
         List<Member> members = memberPage.getContent();
 
 
-        return PageResponse.of(memberPage, memberMapper.toDtoList(members));
+        return PageResponse.of(memberPage, memberMapper.toResponseList(members));
     }
 
     public MemberPublicResponse getMemberById(Long memberId) {
 
         Member member = findExistingMember(memberId);
 
-        return memberMapper.toPublicDto(member);
+        return memberMapper.toPublicResponse(member);
     }
 
     @Transactional
-    public void createMember(MemberRequest memberRequest) {
+    public void createMember(MemberCreateRequest memberCreateRequest) {
 
-        ensureNotReservedNickname(memberRequest.getNickname());
-        ensureNotReservedEmail(memberRequest.getEmail());
+        ensureNotReservedNickname(memberCreateRequest.getNickname());
+        ensureNotReservedEmail(memberCreateRequest.getEmail());
 
-        if(memberRepository.existsByEmail(memberRequest.getEmail())) {
+        if(memberRepository.existsByEmail(memberCreateRequest.getEmail())) {
             throw DuplicateMemberException.duplicateEmail();
         }
 
-        if(memberRepository.existsByNicknameIgnoreCase(memberRequest.getNickname())) {
+        if(memberRepository.existsByNicknameIgnoreCase(memberCreateRequest.getNickname())) {
             throw DuplicateMemberException.duplicateNickname();
         }
 
-        Member memberEntity = memberMapper.toEntity(memberRequest);
+        Member memberEntity = memberMapper.toEntity(memberCreateRequest);
         memberEntity.setRole(UserRole.USER);
-        memberEntity.setPassword(passwordEncoder.encode(memberRequest.getPassword()));
+        memberEntity.setPassword(passwordEncoder.encode(memberCreateRequest.getPassword()));
         memberRepository.save(memberEntity);
     }
 
@@ -103,7 +103,7 @@ public class MemberService{
         if (memberUpdateRequest.getPassword() != null) {
             existingMember.setPassword(passwordEncoder.encode(memberUpdateRequest.getPassword()));
         }
-        return memberMapper.toPublicDto(existingMember);
+        return memberMapper.toPublicResponse(existingMember);
     }
 
     @Transactional

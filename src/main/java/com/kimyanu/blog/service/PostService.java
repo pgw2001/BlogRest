@@ -41,7 +41,7 @@ public class PostService{
         Page<Post> postPage = postRepository.findByIsVisibleTrue(pageDetails);
         List<Post> posts = postPage.getContent();
 
-        return PageResponse.of(postPage, postMapper.toDtoList(posts));
+        return PageResponse.of(postPage, postMapper.toResponseList(posts));
     }
 
     public PageResponse<PostResponse> getAllPostsForAdmin(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
@@ -49,7 +49,7 @@ public class PostService{
         Page<Post> postPage = postRepository.findAllBy(pageDetails);
         List<Post> posts = postPage.getContent();
 
-        return PageResponse.of(postPage, postMapper.toDtoList(posts));
+        return PageResponse.of(postPage, postMapper.toResponseList(posts));
     }
 
     public PostResponse getPostById(Long postId) {
@@ -58,7 +58,7 @@ public class PostService{
                 .filter(Post::getIsVisible)
                 .orElseThrow(PostNotFoundException::new);
 
-        return postMapper.toDto(post);
+        return postMapper.toResponse(post);
     }
 
     public PageResponse<PostResponse> getMyPosts(Long memberId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
@@ -67,7 +67,7 @@ public class PostService{
         Page<Post> postPage = postRepository.findByMemberId(memberId, pageDetails);
         List<Post> posts = postPage.getContent();
 
-        return PageResponse.of(postPage, postMapper.toDtoList(posts));
+        return PageResponse.of(postPage, postMapper.toResponseList(posts));
     }
 
     @Transactional(readOnly = true)
@@ -84,7 +84,7 @@ public class PostService{
         postEntity.setCategory(category);
 
         Post savedPost = postRepository.save(postEntity);
-        return postMapper.toDto(savedPost);
+        return postMapper.toResponse(savedPost);
     }
 
     @Transactional
@@ -106,7 +106,7 @@ public class PostService{
 
         postMapper.updateEntityFromRequest(existingPost, postRequest);
 
-        return postMapper.toDto(existingPost);
+        return postMapper.toResponse(existingPost);
     }
 
     public PostResponse updatePostVisibility(Long postId, PostVisibilityRequest postVisibilityRequest) {
@@ -116,7 +116,7 @@ public class PostService{
 
 
         existingPost.setIsVisible(postVisibilityRequest.getIsVisible());
-        return postMapper.toDto(existingPost);
+        return postMapper.toResponse(existingPost);
     }
 
     public void deletePost(Long memberId, Long postId) {

@@ -10,16 +10,16 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface CommentMapper {
 
-    @Mapping(source = "member.nickname", target = "authorNickname")
-    CommentResponse toDto(Comment comment);
-
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "post", ignore = true)
     @Mapping(target = "member", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     Comment toEntity(CommentRequest commentRequest);
 
-    List<CommentResponse> toDtoList(List<Comment> comments);
+    @Mapping(source = "member.nickname", target = "authorNickname")
+    CommentResponse toResponse(Comment comment);
+
+    List<CommentResponse> toResponseList(List<Comment> comments);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)

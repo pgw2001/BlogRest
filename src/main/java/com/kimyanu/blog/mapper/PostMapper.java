@@ -16,12 +16,6 @@ public interface PostMapper {
     @Mapping(target = "createdAt", ignore = true)
     Post toEntity(PostRequest postRequest);
 
-    @Mapping(source = "member.id" , target = "authorId")
-    @Mapping(source = "member.nickname", target = "authorNickname")
-    @Mapping(source = "category.id", target = "categoryId")
-    @Mapping(source = "category.name", target = "categoryName")
-    PostResponse toDto(Post post);
-
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "member", ignore = true)
@@ -29,5 +23,11 @@ public interface PostMapper {
     @Mapping(target = "createdAt", ignore = true)
     void updateEntityFromRequest(@MappingTarget Post existingPost, PostRequest postRequest);
 
-    List<PostResponse> toDtoList(List<Post> posts);
+    @Mapping(source = "member.id" , target = "authorId")
+    @Mapping(source = "member.nickname", target = "authorNickname")
+    @Mapping(source = "category.id", target = "categoryId")
+    @Mapping(source = "category.name", target = "categoryName")
+    PostResponse toResponse(Post post);
+
+    List<PostResponse> toResponseList(List<Post> posts);
 }

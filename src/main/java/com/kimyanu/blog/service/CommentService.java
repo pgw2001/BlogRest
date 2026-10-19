@@ -49,7 +49,7 @@ public class CommentService{
         Page<Comment> commentPage =  commentRepository.findByPost(post, pageDetails);
         List<Comment> comments = commentPage.getContent();
 
-        return PageResponse.of(commentPage, commentMapper.toDtoList(comments));
+        return PageResponse.of(commentPage, commentMapper.toResponseList(comments));
     }
 
     @Transactional
@@ -66,7 +66,7 @@ public class CommentService{
         comment.setMember(member);
         Comment savedComment = commentRepository.save(comment);
 
-        return commentMapper.toDto(savedComment);
+        return commentMapper.toResponse(savedComment);
     }
 
     @Transactional
@@ -85,7 +85,7 @@ public class CommentService{
         // 매퍼를 사용한 방법(하나밖에 안 바꾸는데 조금 과함? 기존 post 수정 방법과 동일)
 //        commentMapper.updateEntityFromRequest(existingComment, commentRequest);
 
-        return commentMapper.toDto(existingComment);
+        return commentMapper.toResponse(existingComment);
     }
 
     @Transactional
