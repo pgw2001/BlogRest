@@ -1,21 +1,17 @@
 package com.kimyanu.blog.dto.comment;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@JsonPropertyOrder({"id", "content", "authorNickname", "createAt"})
 public class CommentResponse {
-    private List<CommentDto> content;
-    private Integer pageNumber;
-    private Integer pageSize;
-    private Long totalElements;
-    private Integer totalPage;
-    private Boolean isLast;
+    private Long id;
+    private String content;
+    private String authorNickname;
+    private LocalDateTime createdAt;
 }

@@ -1,7 +1,7 @@
 package com.kimyanu.blog.service;
 
-import com.kimyanu.blog.dto.comment.CommentDto;
 import com.kimyanu.blog.dto.comment.CommentRequest;
+import com.kimyanu.blog.dto.comment.CommentResponse;
 import com.kimyanu.blog.dto.common.PageResponse;
 import com.kimyanu.blog.exceptions.custom.CommentNotFoundException;
 import com.kimyanu.blog.exceptions.custom.MemberNotFoundException;
@@ -35,7 +35,7 @@ public class CommentService{
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
 
-    public PageResponse<CommentDto> getCommentsByPostId(
+    public PageResponse<CommentResponse> getCommentsByPostId(
             Long postId,
             Integer pageNumber,
             Integer pageSize,
@@ -53,7 +53,7 @@ public class CommentService{
     }
 
     @Transactional
-    public CommentDto createComment(Long memberId, Long postId, CommentRequest commentRequest) {
+    public CommentResponse createComment(Long memberId, Long postId, CommentRequest commentRequest) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(PostNotFoundException::new);
@@ -70,7 +70,7 @@ public class CommentService{
     }
 
     @Transactional
-    public CommentDto updateComment(Long memberId, Long commentId, CommentRequest commentRequest) {
+    public CommentResponse updateComment(Long memberId, Long commentId, CommentRequest commentRequest) {
 
         Comment existingComment = commentRepository.findById(commentId)
                 .orElseThrow(CommentNotFoundException::new);

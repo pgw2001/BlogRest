@@ -1,8 +1,8 @@
 package com.kimyanu.blog.controller;
 
 import com.kimyanu.blog.config.AppConstant;
-import com.kimyanu.blog.dto.comment.CommentDto;
 import com.kimyanu.blog.dto.comment.CommentRequest;
+import com.kimyanu.blog.dto.comment.CommentResponse;
 import com.kimyanu.blog.dto.common.PageResponse;
 import com.kimyanu.blog.security.CustomUserDetails;
 import com.kimyanu.blog.service.CommentService;
@@ -21,14 +21,14 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("/public/posts/{postId}/comments")
-    public ResponseEntity<PageResponse<CommentDto>> getAllComments(
+    public ResponseEntity<PageResponse<CommentResponse>> getAllComments(
             @PathVariable Long postId,
             @RequestParam (value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
             @RequestParam (value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam (value = "sortBy", defaultValue = AppConstant.SORT_POST_BY) String sortBy,
             @RequestParam (value = "sortOrder", defaultValue = AppConstant.SORT_POST_ASC) String sortOrder) {
 
-        PageResponse<CommentDto> response = commentService.getCommentsByPostId(
+        PageResponse<CommentResponse> response = commentService.getCommentsByPostId(
                 postId,
                 pageNumber,
                 pageSize,
@@ -39,23 +39,23 @@ public class CommentController {
     }
 
     @PostMapping("/posts/{postId}/comments")
-    public ResponseEntity<CommentDto> createComment(
+    public ResponseEntity<CommentResponse> createComment(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long postId,
             @Valid @RequestBody CommentRequest commentRequest) {
 
-        CommentDto commentDto = commentService.createComment(userDetails.getMemberId(), postId, commentRequest);
+        CommentResponse commentDto = commentService.createComment(userDetails.getMemberId(), postId, commentRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(commentDto);
     }
 
     @PutMapping("/comments/{commentId}")
-    public ResponseEntity<CommentDto> updateComment(
+    public ResponseEntity<CommentResponse> updateComment(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long commentId,
             @Valid @RequestBody CommentRequest commentRequest) {
 
-        CommentDto updatedComment = commentService.updateComment(userDetails.getMemberId(), commentId, commentRequest);
+        CommentResponse updatedComment = commentService.updateComment(userDetails.getMemberId(), commentId, commentRequest);
 
         return ResponseEntity.ok().body(updatedComment);
     }
