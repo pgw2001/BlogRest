@@ -1,9 +1,6 @@
 package com.kimyanu.blog.mapper;
 
-import com.kimyanu.blog.dto.member.MemberCreateRequest;
-import com.kimyanu.blog.dto.member.MemberMeResponse;
-import com.kimyanu.blog.dto.member.MemberPublicResponse;
-import com.kimyanu.blog.dto.member.MemberResponse;
+import com.kimyanu.blog.dto.member.*;
 import com.kimyanu.blog.model.Member;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -26,4 +23,6 @@ public interface MemberMapper {
     List<MemberResponse> toResponseList(List<Member> savedMemberList);
 
     MemberMeResponse toMeResponse(Member member);
+
+    MemberAdminResponse toAdminResponse(Member member);
 }

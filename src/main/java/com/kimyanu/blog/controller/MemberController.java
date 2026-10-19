@@ -37,7 +37,6 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    // TODO: 내 정보 조회 API (GET /api/members/me), MemberMeResponse 반환, 인증
     @GetMapping("/members/me")
     public ResponseEntity<MemberMeResponse> getCurrentMember(@AuthenticationPrincipal CustomUserDetails userDetails) {
         MemberMeResponse response = memberService.getCurrentMember(userDetails.getMemberId());
@@ -59,14 +58,26 @@ public class MemberController {
         return ResponseEntity.ok(updatedMember);
     }
 
-    // TODO: 물리 삭제 - 게시글/댓글 추가 후 논리 삭제로 전환
-    // TODO: 물리 삭제 -> 논리 삭제로 전환, 이메일, 닉네임은 개인정보 법에 의거하여 즉시 파기해야 함
-    // TODO: 회원 탈퇴 시 게시글/댓글은 남기고, 회원 정보는 삭제(닉네임, 이메일 등) 탈퇴 시점에 "탈퇴한회원_{memberId}"로 변경, 이메일은 "탈퇴한
-    // TODO: 이메일은 "deleted_{memberId}.@deleted.local"로 변경, 비밀번호는 null로 변경.
-    // TODO: 탈퇴한 회원은 회원 목록에서 조회되지 않도록 처리
+    @PatchMapping("/admin/members/{memberId}/role")
+    public ResponseEntity<MemberAdminResponse> updateMemberRole(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long memberId,
+            @Valid @RequestBody MemberRoleUpdateRequest roleUpdateRequest) {
+
+        MemberAdminResponse updatedMember = memberService.setRole(userDetails.getMemberId(), memberId, roleUpdateRequest);
+        return ResponseEntity.ok(updatedMember);
+    }
+
     @DeleteMapping("/members/me")
     public ResponseEntity<Void> deleteMember(@AuthenticationPrincipal CustomUserDetails userDetails) {
         memberService.deleteMember(userDetails.getMemberId());
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/admin/members/{memberId}")
+    public ResponseEntity<Void> deleteMemberByAdmin(@PathVariable Long memberId) {
+
+        memberService.deleteMember(memberId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,6 +1,6 @@
 package com.kimyanu.blog.model;
 
-import com.kimyanu.blog.enums.UserRole;
+import com.kimyanu.blog.enums.MemberRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -32,7 +32,7 @@ public class Member {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private UserRole role; // USER, ADMIN
+    private MemberRole role; // USER, ADMIN
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

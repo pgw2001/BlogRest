@@ -2,7 +2,7 @@ package com.kimyanu.blog.service;
 
 import com.kimyanu.blog.dto.common.PageResponse;
 import com.kimyanu.blog.dto.member.*;
-import com.kimyanu.blog.enums.UserRole;
+import com.kimyanu.blog.enums.MemberRole;
 import com.kimyanu.blog.exceptions.custom.DuplicateMemberException;
 import com.kimyanu.blog.exceptions.custom.MemberNotFoundException;
 import com.kimyanu.blog.exceptions.custom.ReservedMemberValueException;
@@ -80,7 +80,7 @@ public class MemberService{
         }
 
         Member memberEntity = memberMapper.toEntity(memberCreateRequest);
-        memberEntity.setRole(UserRole.USER);
+        memberEntity.setRole(MemberRole.USER);
         memberEntity.setPassword(passwordEncoder.encode(memberCreateRequest.getPassword()));
         memberRepository.save(memberEntity);
     }
@@ -149,4 +149,16 @@ public class MemberService{
         }
     }
 
+    @Transactional
+    public MemberAdminResponse setRole(Long adminId, Long memberId, MemberRoleUpdateRequest roleUpdateRequest) {
+
+        Member member = findExistingMember(memberId);
+
+        if(member.getId().equals(adminId)) {
+            throw new IllegalArgumentException("관리자는 자신의 역할을 변경할 수 없습니다.");
+        }
+
+        member.setRole(roleUpdateRequest.getRole());
+        return memberMapper.toAdminResponse(member);
+    }
 }

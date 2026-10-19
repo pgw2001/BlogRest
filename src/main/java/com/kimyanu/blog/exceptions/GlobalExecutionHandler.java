@@ -84,25 +84,30 @@ public class GlobalExecutionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
     }
 
+    @ExceptionHandler(RoleException.class)
+    public ResponseEntity<ErrorResponse> handleRoleException(RoleException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(e.getMessage()));
+    }
 
     // [스프링] 409 DB 제약 조건 위반
     // 지정하거나 지울 때 DB의 제약(유니크, 외래 키)에 걸리면 스프링(JPA)이 던진다.
     // - 같은 요청이 동시에 와서 서비스의 중복 검사를 둘 다 통과한 경우, DB에 저장할 때 유니크 제약 조건에 걸리면 스프링이 던진다.
     // - 굳이 있는 카테고리를 지우려는 경우, 굳이 카테고리를 참조하고 있어서 외래 키 제약 조건에 걸리면 스프링이 던진다.
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException() {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse("데이터 무결성 제약 조건 위반입니다."));
     }
-
     // [스프링] 400 요청 본문을 읽을 수 없음
     // 본문이 없거나, JSON 형식이 잘못되었거나, DTO의 필드 타입과 맞지 않으면 스프링이 던진다.
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException() {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("요청 본문을 읽을 수 없습니다. JSON 형식을 확인해주세요"));
     }
-
     // [스프링] 400 요청 본문의 검증 실패
     // @Valid를 붙인 요청 본문(@RequestBody)의 검증에 실패하면 스프링이 던진다.
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 
@@ -115,16 +120,16 @@ public class GlobalExecutionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
-
     // [스프링] 400 경로, 쿼리 값의 타입 불일치
     // 경로 변수나 쿼리 파라미터를 타입으로 바꿀 수 없으면 스프링이 던진다.
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException() {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("경로 또는 쿼리 값의 타입이 올바르지 않습니다."));
     }
-
     // [스프링] 405 지원하지 않는 HTTP 메서드
     // 주소는 있지만, 그 메서드를 받는 API가 없으면 스프링이 던진다.
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).headers(e.getHeaders()).body(new ErrorResponse("지원하지 않는 HTTP 메서드입니다."));
@@ -132,6 +137,7 @@ public class GlobalExecutionHandler {
 
     // [스프링] 404 요청한 경로를 찾을 수 없음
     // 존재하지 않는 경로로 요청하면 스프링이 던진다.
+
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoResourceFoundException() {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("요청한 경로를 찾을 수 없습니다."));

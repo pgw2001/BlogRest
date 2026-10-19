@@ -1,6 +1,6 @@
 package com.kimyanu.blog.enums;
 
-public enum UserRole {
+public enum MemberRole {
     USER,
     ADMIN
 }
