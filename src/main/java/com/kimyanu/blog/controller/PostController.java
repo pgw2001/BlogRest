@@ -1,6 +1,7 @@
 package com.kimyanu.blog.controller;
 
 import com.kimyanu.blog.config.AppConstant;
+import com.kimyanu.blog.dto.common.PageResponse;
 import com.kimyanu.blog.dto.post.PostDto;
 import com.kimyanu.blog.dto.post.PostRequest;
 import com.kimyanu.blog.dto.post.PostResponse;
@@ -33,13 +34,13 @@ public class PostController {
     }
 
     @GetMapping("/admin/posts")
-    public ResponseEntity<PostResponse> getAllPostsForAdmin(
+    public ResponseEntity<PageResponse<PostDto>> getAllPostsForAdmin(
             @RequestParam (value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
             @RequestParam (value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam (value = "sortBy", defaultValue = AppConstant.SORT_POST_BY) String sortBy,
             @RequestParam (value = "sortOrder", defaultValue = AppConstant.SORT_POST_ASC) String sortOrder
     ) {
-        PostResponse posts = postService.getAllPostsForAdmin(pageNumber, pageSize, sortBy, sortOrder);
+        PageResponse<PostDto> posts = postService.getAllPostsForAdmin(pageNumber, pageSize, sortBy, sortOrder);
         return ResponseEntity.ok(posts);
     }
 

@@ -1,8 +1,9 @@
 package com.kimyanu.blog.service;
 
+import com.kimyanu.blog.dto.common.PageResponse;
+import com.kimyanu.blog.dto.member.MemberDto;
 import com.kimyanu.blog.dto.member.MemberPublicDto;
 import com.kimyanu.blog.dto.member.MemberRequest;
-import com.kimyanu.blog.dto.member.MemberResponse;
 import com.kimyanu.blog.dto.member.MemberUpdateRequest;
 import com.kimyanu.blog.enums.UserRole;
 import com.kimyanu.blog.exceptions.custom.DuplicateMemberException;
@@ -40,7 +41,7 @@ public class MemberService{
     private final PostRepository postRepository;
 
     @Transactional(readOnly = true)
-    public MemberResponse getAllMembers(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public PageResponse<MemberDto> getAllMembers(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
 
         Pageable pageable = create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
@@ -50,14 +51,7 @@ public class MemberService{
         List<Member> members = memberPage.getContent();
 
 
-        return new MemberResponse(
-                memberMapper.toDtoList(members),
-                memberPage.getNumber() + 1,
-                memberPage.getSize(),
-                memberPage.getTotalElements(),
-                memberPage.getTotalPages(),
-                memberPage.isLast()
-        );
+        return PageResponse.of(memberPage, memberMapper.toDtoList(members));
     }
 
     public MemberPublicDto getMemberById(Long memberId) {

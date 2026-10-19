@@ -1,9 +1,10 @@
 package com.kimyanu.blog.controller;
 
 import com.kimyanu.blog.config.AppConstant;
+import com.kimyanu.blog.dto.common.PageResponse;
+import com.kimyanu.blog.dto.member.MemberDto;
 import com.kimyanu.blog.dto.member.MemberPublicDto;
 import com.kimyanu.blog.dto.member.MemberRequest;
-import com.kimyanu.blog.dto.member.MemberResponse;
 import com.kimyanu.blog.dto.member.MemberUpdateRequest;
 import com.kimyanu.blog.security.CustomUserDetails;
 import com.kimyanu.blog.service.MemberService;
@@ -22,13 +23,13 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/admin/members")
-    public ResponseEntity<MemberResponse> getAllMembers(
+    public ResponseEntity<PageResponse<MemberDto>> getAllMembers(
             @RequestParam(value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
             @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam(value = "sortBy", defaultValue = AppConstant.SORT_MEMBER_BY) String sortBy,
             @RequestParam(value = "sortOrder", defaultValue = AppConstant.SORT_MEMBER_ASC) String sortOrder
     ) {
-        MemberResponse response = memberService.getAllMembers(pageNumber, pageSize, sortBy, sortOrder);
+        PageResponse<MemberDto> response = memberService.getAllMembers(pageNumber, pageSize, sortBy, sortOrder);
         return ResponseEntity.ok(response);
     }
 

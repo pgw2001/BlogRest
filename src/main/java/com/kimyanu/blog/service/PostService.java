@@ -1,5 +1,6 @@
 package com.kimyanu.blog.service;
 
+import com.kimyanu.blog.dto.common.PageResponse;
 import com.kimyanu.blog.dto.post.PostDto;
 import com.kimyanu.blog.dto.post.PostRequest;
 import com.kimyanu.blog.dto.post.PostResponse;
@@ -51,19 +52,12 @@ public class PostService{
         );
     }
 
-    public PostResponse getAllPostsForAdmin(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public PageResponse<PostDto> getAllPostsForAdmin(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
         Page<Post> postPage = postRepository.findAllBy(pageDetails);
         List<Post> posts = postPage.getContent();
 
-        return new PostResponse(
-                postMapper.toDtoList(posts),
-                postPage.getNumber() + 1,
-                postPage.getSize(),
-                postPage.getTotalElements(),
-                postPage.getTotalPages(),
-                postPage.isLast()
-        );
+        return PageResponse.of(postPage, postMapper.toDtoList(posts));
     }
 
     public PostDto getPostById(Long postId) {

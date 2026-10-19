@@ -3,7 +3,7 @@ package com.kimyanu.blog.controller;
 import com.kimyanu.blog.config.AppConstant;
 import com.kimyanu.blog.dto.comment.CommentDto;
 import com.kimyanu.blog.dto.comment.CommentRequest;
-import com.kimyanu.blog.dto.comment.CommentResponse;
+import com.kimyanu.blog.dto.common.PageResponse;
 import com.kimyanu.blog.security.CustomUserDetails;
 import com.kimyanu.blog.service.CommentService;
 import jakarta.validation.Valid;
@@ -21,14 +21,14 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("/public/posts/{postId}/comments")
-    public ResponseEntity<CommentResponse> getAllComments(
+    public ResponseEntity<PageResponse<CommentDto>> getAllComments(
             @PathVariable Long postId,
             @RequestParam (value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
             @RequestParam (value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam (value = "sortBy", defaultValue = AppConstant.SORT_POST_BY) String sortBy,
             @RequestParam (value = "sortOrder", defaultValue = AppConstant.SORT_POST_ASC) String sortOrder) {
 
-        CommentResponse response = commentService.getCommentsByPostId(
+        PageResponse<CommentDto> response = commentService.getCommentsByPostId(
                 postId,
                 pageNumber,
                 pageSize,

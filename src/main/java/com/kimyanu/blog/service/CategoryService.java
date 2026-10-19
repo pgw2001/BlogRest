@@ -2,7 +2,7 @@ package com.kimyanu.blog.service;
 
 import com.kimyanu.blog.dto.category.CategoryDto;
 import com.kimyanu.blog.dto.category.CategoryRequest;
-import com.kimyanu.blog.dto.category.CategoryResponse;
+import com.kimyanu.blog.dto.common.PageResponse;
 import com.kimyanu.blog.exceptions.custom.CategoryNotFoundException;
 import com.kimyanu.blog.exceptions.custom.DuplicateCategoryException;
 import com.kimyanu.blog.mapper.CategoryMapper;
@@ -34,7 +34,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
-    public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public PageResponse<CategoryDto> getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
         Pageable pageable = create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
 
@@ -45,14 +45,7 @@ public class CategoryService {
         List<Category> categories =  categoryPage.getContent();
 
         // 엔티티를 DTO로 변환하여 반환 (Entity -> DTO)
-        return new CategoryResponse(
-                categoryMapper.toDtoList(categories),
-                categoryPage.getNumber() + 1,
-                categoryPage.getSize(),
-                categoryPage.getTotalElements(),
-                categoryPage.getTotalPages(),
-                categoryPage.isLast()
-        );
+        return PageResponse.of(categoryPage, categoryMapper.toDtoList(categories));
     }
 
     @Transactional

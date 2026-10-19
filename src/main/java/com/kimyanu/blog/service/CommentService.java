@@ -2,7 +2,7 @@ package com.kimyanu.blog.service;
 
 import com.kimyanu.blog.dto.comment.CommentDto;
 import com.kimyanu.blog.dto.comment.CommentRequest;
-import com.kimyanu.blog.dto.comment.CommentResponse;
+import com.kimyanu.blog.dto.common.PageResponse;
 import com.kimyanu.blog.exceptions.custom.CommentNotFoundException;
 import com.kimyanu.blog.exceptions.custom.MemberNotFoundException;
 import com.kimyanu.blog.exceptions.custom.PostNotFoundException;
@@ -35,7 +35,7 @@ public class CommentService{
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
 
-    public CommentResponse getCommentsByPostId(
+    public PageResponse<CommentDto> getCommentsByPostId(
             Long postId,
             Integer pageNumber,
             Integer pageSize,
@@ -49,14 +49,7 @@ public class CommentService{
         Page<Comment> commentPage =  commentRepository.findByPost(post, pageDetails);
         List<Comment> comments = commentPage.getContent();
 
-        return new CommentResponse (
-                commentMapper.toDtoList(comments),
-                commentPage.getNumber() + 1,
-                commentPage.getSize(),
-                commentPage.getTotalElements(),
-                commentPage.getTotalPages(),
-                commentPage.isLast()
-        );
+        return PageResponse.of(commentPage, commentMapper.toDtoList(comments));
     }
 
     @Transactional
