@@ -2,10 +2,7 @@ package com.kimyanu.blog.controller;
 
 import com.kimyanu.blog.config.AppConstant;
 import com.kimyanu.blog.dto.common.PageResponse;
-import com.kimyanu.blog.dto.member.MemberCreateRequest;
-import com.kimyanu.blog.dto.member.MemberPublicResponse;
-import com.kimyanu.blog.dto.member.MemberResponse;
-import com.kimyanu.blog.dto.member.MemberUpdateRequest;
+import com.kimyanu.blog.dto.member.*;
 import com.kimyanu.blog.security.CustomUserDetails;
 import com.kimyanu.blog.service.MemberService;
 import jakarta.validation.Valid;
@@ -36,6 +33,14 @@ public class MemberController {
     @GetMapping("/public/members/{memberId}")
     public ResponseEntity<MemberPublicResponse> getMember(@PathVariable Long memberId) {
         MemberPublicResponse response = memberService.getMemberById(memberId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // TODO: 내 정보 조회 API (GET /api/members/me), MemberMeResponse 반환, 인증
+    @GetMapping("/members/me")
+    public ResponseEntity<MemberMeResponse> getCurrentMember(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        MemberMeResponse response = memberService.getCurrentMember(userDetails.getMemberId());
 
         return ResponseEntity.ok(response);
     }

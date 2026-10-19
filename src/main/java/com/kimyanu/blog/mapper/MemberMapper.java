@@ -1,6 +1,7 @@
 package com.kimyanu.blog.mapper;
 
 import com.kimyanu.blog.dto.member.MemberCreateRequest;
+import com.kimyanu.blog.dto.member.MemberMeResponse;
 import com.kimyanu.blog.dto.member.MemberPublicResponse;
 import com.kimyanu.blog.dto.member.MemberResponse;
 import com.kimyanu.blog.model.Member;
@@ -15,6 +16,7 @@ public interface MemberMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "deletedAt", ignore = true)
     Member toEntity(MemberCreateRequest memberCreateRequest);
 
     MemberResponse toResponse(Member savedMember);
@@ -22,4 +24,6 @@ public interface MemberMapper {
     MemberPublicResponse toPublicResponse(Member savedMember);
 
     List<MemberResponse> toResponseList(List<Member> savedMemberList);
+
+    MemberMeResponse toMeResponse(Member member);
 }

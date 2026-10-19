@@ -1,10 +1,7 @@
 package com.kimyanu.blog.service;
 
 import com.kimyanu.blog.dto.common.PageResponse;
-import com.kimyanu.blog.dto.member.MemberCreateRequest;
-import com.kimyanu.blog.dto.member.MemberPublicResponse;
-import com.kimyanu.blog.dto.member.MemberResponse;
-import com.kimyanu.blog.dto.member.MemberUpdateRequest;
+import com.kimyanu.blog.dto.member.*;
 import com.kimyanu.blog.enums.UserRole;
 import com.kimyanu.blog.exceptions.custom.DuplicateMemberException;
 import com.kimyanu.blog.exceptions.custom.MemberNotFoundException;
@@ -59,6 +56,13 @@ public class MemberService{
         Member member = findExistingMember(memberId);
 
         return memberMapper.toPublicResponse(member);
+    }
+
+    public MemberMeResponse getCurrentMember(Long memberId) {
+
+        Member member = findExistingMember(memberId);
+
+        return memberMapper.toMeResponse(member);
     }
 
     @Transactional
@@ -144,4 +148,5 @@ public class MemberService{
             throw ReservedMemberValueException.invalidEmail();
         }
     }
+
 }
