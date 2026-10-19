@@ -1,7 +1,7 @@
 package com.kimyanu.blog.mapper;
 
-import com.kimyanu.blog.dto.category.CategoryDto;
 import com.kimyanu.blog.dto.category.CategoryRequest;
+import com.kimyanu.blog.dto.category.CategoryResponse;
 import com.kimyanu.blog.model.Category;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,7 +15,7 @@ public interface CategoryMapper {
     Category toEntity(CategoryRequest categoryRequest);
 
     // Entity -> DTO
-    List<CategoryDto> toDtoList(List<Category> categories);
+    List<CategoryResponse> toDtoList(List<Category> categories);
 
-    CategoryDto toDto(Category savedCategory);
+    CategoryResponse toDto(Category savedCategory);
 }

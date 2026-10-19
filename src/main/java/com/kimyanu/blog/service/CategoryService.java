@@ -1,7 +1,7 @@
 package com.kimyanu.blog.service;
 
-import com.kimyanu.blog.dto.category.CategoryDto;
 import com.kimyanu.blog.dto.category.CategoryRequest;
+import com.kimyanu.blog.dto.category.CategoryResponse;
 import com.kimyanu.blog.dto.common.PageResponse;
 import com.kimyanu.blog.exceptions.custom.CategoryNotFoundException;
 import com.kimyanu.blog.exceptions.custom.DuplicateCategoryException;
@@ -34,7 +34,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
-    public PageResponse<CategoryDto> getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public PageResponse<CategoryResponse> getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
         Pageable pageable = create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
 
@@ -49,7 +49,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDto createCategory(CategoryRequest categoryRequest) {
+    public CategoryResponse createCategory(CategoryRequest categoryRequest) {
         boolean duplicate = categoryRepository.existsByNameIgnoreCase(categoryRequest.getName());
 
         if(duplicate) {
@@ -63,7 +63,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDto updateCategory(Long categoryId, CategoryRequest categoryRequest) {
+    public CategoryResponse updateCategory(Long categoryId, CategoryRequest categoryRequest) {
 
         Category existCategory = categoryRepository
                 .findById(categoryId)
@@ -87,7 +87,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDto deleteCategory(Long categoryId) {
+    public CategoryResponse deleteCategory(Long categoryId) {
         // 데이터를 지운다는 목적은 똑같다.
         // findById + delete() : 존재 확인 + 객체가 필요할 때.
         // existsById + deleteById : 존재 여부를 명시적으로 확인하고 삭제할 때.
