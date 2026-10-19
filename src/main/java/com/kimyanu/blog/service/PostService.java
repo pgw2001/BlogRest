@@ -1,7 +1,6 @@
 package com.kimyanu.blog.service;
 
 import com.kimyanu.blog.dto.common.PageResponse;
-import com.kimyanu.blog.dto.post.PostDto;
 import com.kimyanu.blog.dto.post.PostRequest;
 import com.kimyanu.blog.dto.post.PostResponse;
 import com.kimyanu.blog.dto.post.PostVisibilityRequest;
@@ -37,22 +36,15 @@ public class PostService{
     private final MemberRepository memberRepository;
     private final CategoryRepository categoryRepository;
 
-    public PostResponse getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public PageResponse<PostResponse> getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
         Page<Post> postPage = postRepository.findByIsVisibleTrue(pageDetails);
         List<Post> posts = postPage.getContent();
 
-        return new PostResponse(
-                postMapper.toDtoList(posts),
-                postPage.getNumber() + 1,
-                postPage.getSize(),
-                postPage.getTotalElements(),
-                postPage.getTotalPages(),
-                postPage.isLast()
-        );
+        return PageResponse.of(postPage, postMapper.toDtoList(posts));
     }
 
-    public PageResponse<PostDto> getAllPostsForAdmin(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public PageResponse<PostResponse> getAllPostsForAdmin(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
         Page<Post> postPage = postRepository.findAllBy(pageDetails);
         List<Post> posts = postPage.getContent();
@@ -60,7 +52,7 @@ public class PostService{
         return PageResponse.of(postPage, postMapper.toDtoList(posts));
     }
 
-    public PostDto getPostById(Long postId) {
+    public PostResponse getPostById(Long postId) {
 
         Post post = postRepository.findWithMemberAndCategoryById(postId)
                 .filter(Post::getIsVisible)
@@ -69,28 +61,17 @@ public class PostService{
         return postMapper.toDto(post);
     }
 
-    public PostResponse getMyPosts(Long memberId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public PageResponse<PostResponse> getMyPosts(Long memberId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
-//        Member member = memberRepository.findById(memberId)
-//                .orElseThrow(() -> new NoSuchElementException("회원이 존재하지 않습니다." + memberId));
-
-
-        Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
+        Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_MY_FIELDS);
         Page<Post> postPage = postRepository.findByMemberId(memberId, pageDetails);
         List<Post> posts = postPage.getContent();
 
-        return new PostResponse(
-                postMapper.toDtoList(posts),
-                postPage.getNumber() + 1,
-                postPage.getSize(),
-                postPage.getTotalElements(),
-                postPage.getTotalPages(),
-                postPage.isLast()
-        );
+        return PageResponse.of(postPage, postMapper.toDtoList(posts));
     }
 
     @Transactional(readOnly = true)
-    public PostDto createPost(PostRequest postRequest, Long memberId) {
+    public PostResponse createPost(PostRequest postRequest, Long memberId) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(MemberNotFoundException::new);
@@ -107,7 +88,7 @@ public class PostService{
     }
 
     @Transactional
-    public PostDto updatePost(Long memberId, Long postId, PostRequest postRequest) {
+    public PostResponse updatePost(Long memberId, Long postId, PostRequest postRequest) {
 
         Post existingPost = postRepository.findWithMemberAndCategoryById(postId)
                 .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다 : " + postId));
@@ -128,7 +109,7 @@ public class PostService{
         return postMapper.toDto(existingPost);
     }
 
-    public PostDto updatePostVisibility(Long postId, PostVisibilityRequest postVisibilityRequest) {
+    public PostResponse updatePostVisibility(Long postId, PostVisibilityRequest postVisibilityRequest) {
 
         Post existingPost = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다. " + postId));

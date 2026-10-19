@@ -1,21 +1,22 @@
 package com.kimyanu.blog.dto.post;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class PostResponse {
-    private List<PostDto> content;
-    private Integer pageNumber;
-    private Integer pageSize;
-    private Long totalElements;
-    private Integer totalPage;
-    private Boolean lastPage;
+    private Long id;
+    private String title;
+    private String content;
+    private String thumbnail;
+    private Boolean isVisible;
+    private LocalDateTime createdAt;
+
+    private Long authorId;
+    private String authorNickname;
+    private Long categoryId;
+    private String categoryName;
 }

@@ -2,7 +2,6 @@ package com.kimyanu.blog.controller;
 
 import com.kimyanu.blog.config.AppConstant;
 import com.kimyanu.blog.dto.common.PageResponse;
-import com.kimyanu.blog.dto.post.PostDto;
 import com.kimyanu.blog.dto.post.PostRequest;
 import com.kimyanu.blog.dto.post.PostResponse;
 import com.kimyanu.blog.dto.post.PostVisibilityRequest;
@@ -23,74 +22,74 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/public/posts")
-    public ResponseEntity<PostResponse> getAllPosts(
+    public ResponseEntity<PageResponse<PostResponse>> getAllPosts(
             @RequestParam (value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
             @RequestParam (value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam (value = "sortBy", defaultValue = AppConstant.SORT_POST_BY) String sortBy,
             @RequestParam (value = "sortOrder", defaultValue = AppConstant.SORT_POST_ASC) String sortOrder
             ) {
-        PostResponse posts = postService.getAllPosts(pageNumber, pageSize, sortBy, sortOrder);
+        PageResponse<PostResponse> posts = postService.getAllPosts(pageNumber, pageSize, sortBy, sortOrder);
         return ResponseEntity.ok(posts);
     }
 
     @GetMapping("/admin/posts")
-    public ResponseEntity<PageResponse<PostDto>> getAllPostsForAdmin(
+    public ResponseEntity<PageResponse<PostResponse>> getAllPostsForAdmin(
             @RequestParam (value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
             @RequestParam (value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam (value = "sortBy", defaultValue = AppConstant.SORT_POST_BY) String sortBy,
             @RequestParam (value = "sortOrder", defaultValue = AppConstant.SORT_POST_ASC) String sortOrder
     ) {
-        PageResponse<PostDto> posts = postService.getAllPostsForAdmin(pageNumber, pageSize, sortBy, sortOrder);
+        PageResponse<PostResponse> posts = postService.getAllPostsForAdmin(pageNumber, pageSize, sortBy, sortOrder);
         return ResponseEntity.ok(posts);
     }
 
     @GetMapping("/public/posts/{postId}")
-    public ResponseEntity<PostDto> getPostById(@PathVariable Long postId) {
+    public ResponseEntity<PostResponse> getPostById(@PathVariable Long postId) {
 
-        PostDto post = postService.getPostById(postId);
+        PostResponse post = postService.getPostById(postId);
 
         return ResponseEntity.ok(post);
     }
 
     @GetMapping("/members/me/posts")
-    public ResponseEntity<PostResponse> getMyPosts(
+    public ResponseEntity<PageResponse<PostResponse>> getMyPosts(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam (value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
             @RequestParam (value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam (value = "sortBy", defaultValue = AppConstant.SORT_POST_BY) String sortBy,
             @RequestParam (value = "sortOrder", defaultValue = AppConstant.SORT_POST_ASC) String sortOrder) {
 
-        PostResponse myPosts = postService.getMyPosts(userDetails.getMemberId(), pageNumber, pageSize, sortBy, sortOrder);
+        PageResponse<PostResponse> myPosts = postService.getMyPosts(userDetails.getMemberId(), pageNumber, pageSize, sortBy, sortOrder);
 
         return ResponseEntity.ok(myPosts);
     }
 
     @PostMapping("/posts")
-    public ResponseEntity<PostDto> createPost(
+    public ResponseEntity<PostResponse> createPost(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody PostRequest postRequest) {
-        PostDto postDto = postService.createPost(postRequest, userDetails.getMemberId());
-        return ResponseEntity.ok(postDto);
+        PostResponse postResponse = postService.createPost(postRequest, userDetails.getMemberId());
+        return ResponseEntity.ok(postResponse);
     }
 
     @PutMapping("/posts/{postId}")
-    public ResponseEntity<PostDto> updatePost(
+    public ResponseEntity<PostResponse> updatePost(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long postId,
             @Valid @RequestBody PostRequest postRequest) {
 
-        PostDto updatedPost = postService.updatePost(userDetails.getMemberId(),postId, postRequest);
+        PostResponse updatedPost = postService.updatePost(userDetails.getMemberId(),postId, postRequest);
 
         return ResponseEntity.ok(updatedPost);
     }
 
     @PutMapping("/admin/posts/{postId}/visibility")
     @Transactional
-    public ResponseEntity<PostDto> updatePostVisibility(
+    public ResponseEntity<PostResponse> updatePostVisibility(
             @PathVariable Long postId,
             @Valid @RequestBody PostVisibilityRequest postVisibilityRequest) {
 
-        PostDto response = postService.updatePostVisibility(postId, postVisibilityRequest);
+        PostResponse response = postService.updatePostVisibility(postId, postVisibilityRequest);
 
         return ResponseEntity.ok(response);
     }
