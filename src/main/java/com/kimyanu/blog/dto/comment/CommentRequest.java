@@ -2,13 +2,9 @@ package com.kimyanu.blog.dto.comment;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
 public class CommentRequest {
 
     @NotBlank(message = "본문은 필수입니다.")

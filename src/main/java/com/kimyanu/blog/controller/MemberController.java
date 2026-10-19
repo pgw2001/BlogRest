@@ -2,9 +2,9 @@ package com.kimyanu.blog.controller;
 
 import com.kimyanu.blog.config.AppConstant;
 import com.kimyanu.blog.dto.common.PageResponse;
-import com.kimyanu.blog.dto.member.MemberDto;
-import com.kimyanu.blog.dto.member.MemberPublicDto;
+import com.kimyanu.blog.dto.member.MemberPublicResponse;
 import com.kimyanu.blog.dto.member.MemberRequest;
+import com.kimyanu.blog.dto.member.MemberResponse;
 import com.kimyanu.blog.dto.member.MemberUpdateRequest;
 import com.kimyanu.blog.security.CustomUserDetails;
 import com.kimyanu.blog.service.MemberService;
@@ -23,19 +23,19 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/admin/members")
-    public ResponseEntity<PageResponse<MemberDto>> getAllMembers(
+    public ResponseEntity<PageResponse<MemberResponse>> getAllMembers(
             @RequestParam(value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
             @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam(value = "sortBy", defaultValue = AppConstant.SORT_MEMBER_BY) String sortBy,
             @RequestParam(value = "sortOrder", defaultValue = AppConstant.SORT_MEMBER_ASC) String sortOrder
     ) {
-        PageResponse<MemberDto> response = memberService.getAllMembers(pageNumber, pageSize, sortBy, sortOrder);
+        PageResponse<MemberResponse> response = memberService.getAllMembers(pageNumber, pageSize, sortBy, sortOrder);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/public/members/{memberId}")
-    public ResponseEntity<MemberPublicDto> getMember(@PathVariable Long memberId) {
-        MemberPublicDto response = memberService.getMemberById(memberId);
+    public ResponseEntity<MemberPublicResponse> getMember(@PathVariable Long memberId) {
+        MemberPublicResponse response = memberService.getMemberById(memberId);
 
         return ResponseEntity.ok(response);
     }
@@ -47,10 +47,10 @@ public class MemberController {
     }
 
     @PutMapping("/members/me")
-    public ResponseEntity<MemberPublicDto> updateMember(
+    public ResponseEntity<MemberPublicResponse> updateMember(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody MemberUpdateRequest memberUpdateRequest) {
-        MemberPublicDto updatedMember = memberService.updateMember(userDetails.getMemberId(), memberUpdateRequest);
+        MemberPublicResponse updatedMember = memberService.updateMember(userDetails.getMemberId(), memberUpdateRequest);
         return ResponseEntity.ok(updatedMember);
     }
 

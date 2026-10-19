@@ -2,10 +2,8 @@ package com.kimyanu.blog.dto.member;
 
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 public class MemberUpdateRequest {
     @Size(min = 1, max = 20, message = "닉네임은 1자 이상 20자 이하로 작성해주세요.")
     private String nickname;
