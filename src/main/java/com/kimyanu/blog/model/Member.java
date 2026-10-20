@@ -39,6 +39,9 @@ public class Member {
 
     private LocalDateTime deletedAt;
 
+    // 토큰 무효화 기준 시간, 이 시간 이후에 발급된 토큰만 유효하다.
+    private LocalDateTime tokenInvalidBefore;
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();

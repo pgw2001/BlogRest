@@ -4,12 +4,14 @@ import com.kimyanu.blog.dto.auth.LoginRequest;
 import com.kimyanu.blog.dto.auth.LoginResponse;
 import com.kimyanu.blog.security.CustomUserDetails;
 import com.kimyanu.blog.security.JwtProvider;
+import com.kimyanu.blog.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,7 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
+    private final AuthService authService;
 
     @PostMapping("/public/auth/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
@@ -51,6 +54,17 @@ public class AuthController {
         // 로그인 성공!
 
         return ResponseEntity.ok(new LoginResponse(token, "Bearer"));
+    }
+    
+    @PostMapping("/auth/logout")
+    public ResponseEntity<Void> logout(@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        Long memberId = userDetails.getMemberId();
+
+        // 로그아웃 시, 토큰 무효화 처리
+        authService.logout(memberId);
+
+        return ResponseEntity.ok().build();
     }
 
 }

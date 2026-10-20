@@ -16,6 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Objects;
 
 // 요청에 담긴 토큰을 확인해서, 이 요청을 누가 보냈는지 스프링 시큐리티에 알려주는 필터
 // Basic 인증에서는 시큐리티가 기본으로 해주던 일을 토큰 방식에 맞게 직접 작성한 것이다.
@@ -30,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(Member member) {
         CustomUserDetails userDetails = new CustomUserDetails(member);
 
-        // 6. 인증된 사용자라는 Authentication 객체를 생성한다.
+        //   인증된 사용자라는 Authentication 객체를 생성한다.
         // - 첫 번째 인자: 인증된 사용자 정보(CustomUserDetails)
         // - 두 번째 인자: 비밀번호(null, 토큰으로 인증했으므로 필요 없음)
         // - 세 번째 인자: 권한 목록(ROLE_USER, ROLE_ADMIN 등)
@@ -70,11 +73,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Long memberId = Long.valueOf(claims.getSubject());
                 Member member = memberRepository.findByIdAndDeletedAtIsNull(memberId).orElse(null);
 
-                if (member != null) {
-                    // 5. 찾은 회원으로 인증된 Authentication 객체를 생성한다.
+                // 5. 토큰이 발급된 시각을 꺼낸다.
+                //    토큰에는 시각이 Date로 들어 있어서 회원의 tokenInvalidBefore와 비교할 수 있도록 LocalDateTime으로 바꾼다.
+                LocalDateTime issuedAt = LocalDateTime.ofInstant(
+                        claims.getIssuedAt().toInstant(), ZoneId.systemDefault()
+                );
+
+                boolean isTokenValid = Objects.requireNonNull(member).getTokenInvalidBefore() == null || !issuedAt.isBefore(member.getTokenInvalidBefore());
+
+                // 6. 인증해도 되는 토큰인지 확인한다. 아래의 두 가지를 모두 만족해야 한다.
+                //    - 회원이 있다. (탈퇴한 회원의 토큰을 막는다.)
+                //    - 로그아웃한 적이 없거나(tokenInvalidBefore가 null), 로그아웃한 뒤에 발급한 토큰이다. (로그아웃하기 전에 발급한 토큰을 막는다.)
+                //    만족하지 않으면 인증 정볼르 넣지 않고 넘어간다. 토큰이 없는 요청과 같게 처리된다.
+                if (member != null && (member.getTokenInvalidBefore() == null || issuedAt.isAfter(member.getTokenInvalidBefore()))) {
+                    // 7. 찾은 회원으로 인증된 Authentication 객체를 생성한다.
                     UsernamePasswordAuthenticationToken authentication = getUsernamePasswordAuthenticationToken(member);
 
-                    // 6. 인증 정보를 스프링 시큐리티 컨텍스트에 저장한다.
+                    // 8. 인증 정보를 스프링 시큐리티 컨텍스트에 저장한다.
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
 

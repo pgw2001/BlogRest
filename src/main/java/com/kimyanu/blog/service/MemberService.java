@@ -111,6 +111,19 @@ public class MemberService{
     }
 
     @Transactional
+    public MemberAdminResponse setRole(Long adminId, Long memberId, MemberRoleUpdateRequest roleUpdateRequest) {
+
+        Member member = findExistingMember(memberId);
+
+        if(member.getId().equals(adminId)) {
+            throw new IllegalArgumentException("관리자는 자신의 역할을 변경할 수 없습니다.");
+        }
+
+        member.setRole(roleUpdateRequest.getRole());
+        return memberMapper.toAdminResponse(member);
+    }
+
+    @Transactional
     public void deleteMember(Long memberId) {
 
         // 1. 회원 존재 여부 확인 및 정보 저장
@@ -147,18 +160,5 @@ public class MemberService{
         if(email.endsWith(DELETED_EMAIL_DOMAIN)) {
             throw ReservedMemberValueException.invalidEmail();
         }
-    }
-
-    @Transactional
-    public MemberAdminResponse setRole(Long adminId, Long memberId, MemberRoleUpdateRequest roleUpdateRequest) {
-
-        Member member = findExistingMember(memberId);
-
-        if(member.getId().equals(adminId)) {
-            throw new IllegalArgumentException("관리자는 자신의 역할을 변경할 수 없습니다.");
-        }
-
-        member.setRole(roleUpdateRequest.getRole());
-        return memberMapper.toAdminResponse(member);
     }
 }
