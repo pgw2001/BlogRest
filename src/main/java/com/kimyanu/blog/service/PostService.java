@@ -4,6 +4,7 @@ import com.kimyanu.blog.dto.common.PageResponse;
 import com.kimyanu.blog.dto.post.PostRequest;
 import com.kimyanu.blog.dto.post.PostResponse;
 import com.kimyanu.blog.dto.post.PostVisibilityRequest;
+import com.kimyanu.blog.enums.MemberRole;
 import com.kimyanu.blog.exceptions.custom.CategoryNotFoundException;
 import com.kimyanu.blog.exceptions.custom.ForbiddenException;
 import com.kimyanu.blog.exceptions.custom.MemberNotFoundException;
@@ -52,11 +53,17 @@ public class PostService{
     }
 
     // 감춘 글이어도 작성자 본인이나 관리자는 볼 수 있다.
-    public PostResponse getPostById(Long postId) {
+    public PostResponse getPostById(Long memberId, Long postId, MemberRole role) {
 
         Post post = postRepository.findWithMemberAndCategoryById(postId)
-                .filter(Post::getIsVisible)
                 .orElseThrow(PostNotFoundException::new);
+
+        boolean isAuthor = post.getMember().getId().equals(memberId);
+        boolean isAdmin = role == MemberRole.ADMIN;
+
+        if (!post.getIsVisible() && !isAuthor && !isAdmin) {
+            throw new PostNotFoundException();
+        }
 
         return postMapper.toResponse(post);
     }
@@ -121,7 +128,6 @@ public class PostService{
         postRepository.delete(existingPost);
     }
 
-    // 작성자 본인의 게시글을 찾는다. 작성자가 아니면 비공개 글은 없는 것처럼, 공개 글은 권한 없음으로 응답한다.
     private Post findOwnPost(Long memberId, Long postId) {
 
         Post post = postRepository.findWithMemberAndCategoryById(postId)
@@ -133,7 +139,6 @@ public class PostService{
             }
         }
 
-        // ForbiddenException
         if (!post.getMember().getId().equals(memberId)) {
             throw new ForbiddenException("게시글 작성자만 수정할 수 있습니다.");
         }

@@ -1,6 +1,7 @@
 package com.kimyanu.blog.dto.member;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.kimyanu.blog.enums.MemberRole;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,6 @@ public class MemberMeResponse {
     private Long id;
     private String email;
     private String nickname;
-    private String role;
+    private MemberRole role;
     private LocalDateTime createdAt;
 }

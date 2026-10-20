@@ -1,5 +1,6 @@
 package com.kimyanu.blog.security;
 
+import com.kimyanu.blog.enums.MemberRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -24,7 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
 
-    private static UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(Long memberId, String email, String role) {
+    private static UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(Long memberId, String email, MemberRole role) {
         CustomUserDetails userDetails = new CustomUserDetails(memberId, email, role);
 
         // 6. 인증된 사용자라는 Authentication 객체를 생성한다.
@@ -64,7 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 4. 토큰의 subject와 claims에서 필요한 정보를 꺼낸다.
                 Long memberId = Long.valueOf(claims.getSubject());
                 String email = claims.get("email", String.class);
-                String role = claims.get("role", String.class);
+                MemberRole role = MemberRole.valueOf(claims.get("role", String.class));
 
                 // 5. 토큰에 들어있는 정보로 스프링 시큐리티가 인증 관리에서 사용할 CustomUserDetails 객체를 생성한다.
                 // (DB를 조회하지 않고, 토큰에 들어있는 정보만으로 인증 정보를 만든다.)

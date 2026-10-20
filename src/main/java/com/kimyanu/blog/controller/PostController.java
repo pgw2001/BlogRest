@@ -5,6 +5,7 @@ import com.kimyanu.blog.dto.common.PageResponse;
 import com.kimyanu.blog.dto.post.PostRequest;
 import com.kimyanu.blog.dto.post.PostResponse;
 import com.kimyanu.blog.dto.post.PostVisibilityRequest;
+import com.kimyanu.blog.enums.MemberRole;
 import com.kimyanu.blog.security.CustomUserDetails;
 import com.kimyanu.blog.service.PostService;
 import jakarta.validation.Valid;
@@ -44,9 +45,12 @@ public class PostController {
     }
 
     @GetMapping("/public/posts/{postId}")
-    public ResponseEntity<PostResponse> getPostById(@PathVariable Long postId) {
+    public ResponseEntity<PostResponse> getPostById(@AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long postId) {
 
-        PostResponse post = postService.getPostById(postId);
+        Long memberId = (userDetails != null) ? userDetails.getMemberId() : null;
+        MemberRole role = (userDetails != null) ? userDetails.getRole() : null;
+
+        PostResponse post = postService.getPostById(memberId, postId, role);
 
         return ResponseEntity.ok(post);
     }

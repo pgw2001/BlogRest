@@ -1,5 +1,6 @@
 package com.kimyanu.blog.security;
 
+import com.kimyanu.blog.enums.MemberRole;
 import com.kimyanu.blog.model.Member;
 import lombok.Getter;
 import org.jspecify.annotations.NullMarked;
@@ -17,16 +18,16 @@ public class CustomUserDetails implements UserDetails {
     private final Long memberId;
     private final String email;
     private final @Nullable String password;
-    private final String role;
+    private final MemberRole role;
 
     public CustomUserDetails(Member member) {
         this.memberId = member.getId();
         this.email = member.getEmail();
         this.password = member.getPassword();
-        this.role = member.getRole().name();
+        this.role = member.getRole();
     }
 
-    public CustomUserDetails(Long memberId, String email, String role) {
+    public CustomUserDetails(Long memberId, String email, MemberRole role) {
         this.memberId = memberId;
         this.email = email;
         this.password = null;
