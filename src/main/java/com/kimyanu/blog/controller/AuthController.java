@@ -55,7 +55,7 @@ public class AuthController {
 
         return ResponseEntity.ok(new LoginResponse(token, "Bearer"));
     }
-    
+
     @PostMapping("/auth/logout")
     public ResponseEntity<Void> logout(@AuthenticationPrincipal CustomUserDetails userDetails) {
 

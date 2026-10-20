@@ -13,6 +13,9 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(
+        uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "member_id"})
+)
 public class Likes {
 
     @Id
