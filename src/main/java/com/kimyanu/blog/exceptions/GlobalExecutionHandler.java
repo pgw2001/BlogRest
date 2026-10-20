@@ -84,9 +84,18 @@ public class GlobalExecutionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
     }
 
+    // [커스텀] 409 관리자 역할 변경 방지
+    // 관리자가 자신의 역할을 변경하려고 할 때 던지는 에러
     @ExceptionHandler(RoleException.class)
     public ResponseEntity<ErrorResponse> handleRoleException(RoleException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(e.getMessage()));
+    }
+
+    // [커스텀] 403 접근 권한 없음
+    // 비즈니스 로직에서 권한이 없는 요청을 하면 던진다. (본인만 수정/삭제 가능한 API)
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
     }
 
     // [스프링] 409 DB 제약 조건 위반
@@ -137,12 +146,12 @@ public class GlobalExecutionHandler {
 
     // [스프링] 404 요청한 경로를 찾을 수 없음
     // 존재하지 않는 경로로 요청하면 스프링이 던진다.
-
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoResourceFoundException() {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("요청한 경로를 찾을 수 없습니다."));
     }
 
+    // [스프링] 500 영속성 컨텍스트 닫힘
     @ExceptionHandler(LazyInitializationException.class)
     public ResponseEntity<ErrorResponse> handleLazyInitializationException() {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("영속성 컨텍스트가 닫혀서 LAZY 연관을 읽을 수 없습니다. OSIV 설정을 확인하세요."));

@@ -5,6 +5,7 @@ import com.kimyanu.blog.dto.post.PostRequest;
 import com.kimyanu.blog.dto.post.PostResponse;
 import com.kimyanu.blog.dto.post.PostVisibilityRequest;
 import com.kimyanu.blog.exceptions.custom.CategoryNotFoundException;
+import com.kimyanu.blog.exceptions.custom.ForbiddenException;
 import com.kimyanu.blog.exceptions.custom.MemberNotFoundException;
 import com.kimyanu.blog.exceptions.custom.PostNotFoundException;
 import com.kimyanu.blog.mapper.PostMapper;
@@ -18,12 +19,10 @@ import com.kimyanu.blog.util.PageableFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +51,7 @@ public class PostService{
         return PageResponse.of(postPage, postMapper.toResponseList(posts));
     }
 
+    // 감춘 글이어도 작성자 본인이나 관리자는 볼 수 있다.
     public PostResponse getPostById(Long postId) {
 
         Post post = postRepository.findWithMemberAndCategoryById(postId)
@@ -70,7 +70,7 @@ public class PostService{
         return PageResponse.of(postPage, postMapper.toResponseList(posts));
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public PostResponse createPost(PostRequest postRequest, Long memberId) {
 
         Member member = memberRepository.findById(memberId)
@@ -90,17 +90,11 @@ public class PostService{
     @Transactional
     public PostResponse updatePost(Long memberId, Long postId, PostRequest postRequest) {
 
-        Post existingPost = postRepository.findWithMemberAndCategoryById(postId)
-                .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다 : " + postId));
-
-        // == Access Control: Only the author of the post can update it
-        if (!existingPost.getMember().getId().equals(memberId)) {
-            throw new AccessDeniedException("게시글 작성자만 수정할 수 있습니다.");
-        }
+        Post existingPost = findOwnPost(memberId, postId);
 
         if(postRequest.getCategoryId() != null && !postRequest.getCategoryId().equals(existingPost.getCategory().getId())) {
             Category category = categoryRepository.findById(postRequest.getCategoryId())
-                    .orElseThrow(() -> new CategoryNotFoundException(postRequest.getCategoryId()));
+                    .orElseThrow(CategoryNotFoundException::new);
             existingPost.setCategory(category);
         }
 
@@ -109,10 +103,11 @@ public class PostService{
         return postMapper.toResponse(existingPost);
     }
 
+    @Transactional
     public PostResponse updatePostVisibility(Long postId, PostVisibilityRequest postVisibilityRequest) {
 
         Post existingPost = postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다. " + postId));
+                .orElseThrow(PostNotFoundException::new);
 
 
         existingPost.setIsVisible(postVisibilityRequest.getIsVisible());
@@ -121,10 +116,28 @@ public class PostService{
 
     public void deletePost(Long memberId, Long postId) {
 
-        Post existingPost = postRepository.findWithMemberAndCategoryById(postId)
-                .filter(post -> post.getMember().getId().equals(memberId))
-                .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다 : " + postId));
+        Post existingPost = findOwnPost(memberId, postId);
 
         postRepository.delete(existingPost);
+    }
+
+    // 작성자 본인의 게시글을 찾는다. 작성자가 아니면 비공개 글은 없는 것처럼, 공개 글은 권한 없음으로 응답한다.
+    private Post findOwnPost(Long memberId, Long postId) {
+
+        Post post = postRepository.findWithMemberAndCategoryById(postId)
+                .orElseThrow(PostNotFoundException::new);
+
+        if (!post.getMember().getId().equals(memberId)) {
+            if(!post.getIsVisible()) {
+                throw new PostNotFoundException();
+            }
+        }
+
+        // ForbiddenException
+        if (!post.getMember().getId().equals(memberId)) {
+            throw new ForbiddenException("게시글 작성자만 수정할 수 있습니다.");
+        }
+
+        return post;
     }
 }
