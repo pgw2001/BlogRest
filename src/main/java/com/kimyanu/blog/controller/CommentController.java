@@ -21,14 +21,32 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("/public/posts/{postId}/comments")
-    public ResponseEntity<PageResponse<CommentResponse>> getAllComments(
+    public ResponseEntity<PageResponse<CommentResponse>> getCommentsByPostId(
             @PathVariable Long postId,
             @RequestParam (value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
             @RequestParam (value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam (value = "sortBy", defaultValue = AppConstant.SORT_POST_BY) String sortBy,
             @RequestParam (value = "sortOrder", defaultValue = AppConstant.SORT_POST_ASC) String sortOrder) {
 
-        PageResponse<CommentResponse> response = commentService.getCommentsByPostId(
+        PageResponse<CommentResponse> response = commentService.getVisibleCommentsByPostId(
+                postId,
+                pageNumber,
+                pageSize,
+                sortBy,
+                sortOrder);
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/admin/posts/{postId}/comments")
+    public ResponseEntity<PageResponse<CommentResponse>> getCommentsByPostIdForAdmin(
+            @PathVariable Long postId,
+            @RequestParam (value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
+            @RequestParam (value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
+            @RequestParam (value = "sortBy", defaultValue = AppConstant.SORT_POST_BY) String sortBy,
+            @RequestParam (value = "sortOrder", defaultValue = AppConstant.SORT_POST_ASC) String sortOrder) {
+
+        PageResponse<CommentResponse> response = commentService.getCommentsByPostIdForAdmin(
                 postId,
                 pageNumber,
                 pageSize,

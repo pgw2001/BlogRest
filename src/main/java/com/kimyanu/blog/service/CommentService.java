@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +34,24 @@ public class CommentService{
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
 
-    public PageResponse<CommentResponse> getCommentsByPostId(
+    public PageResponse<CommentResponse> getVisibleCommentsByPostId(
+            Long postId,
+            Integer pageNumber,
+            Integer pageSize,
+            String sortBy,
+            String sortOrder) {
+
+        Post post = postRepository.findByIdAndIsVisibleTrue(postId)
+                .orElseThrow(PostNotFoundException::new);
+
+        Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
+        Page<Comment> commentPage = commentRepository.findByPost(post, pageDetails);
+        List<Comment> comments = commentPage.getContent();
+
+        return PageResponse.of(commentPage, commentMapper.toResponseList(comments));
+    }
+
+    public PageResponse<CommentResponse> getCommentsByPostIdForAdmin(
             Long postId,
             Integer pageNumber,
             Integer pageSize,
@@ -43,10 +59,10 @@ public class CommentService{
             String sortOrder) {
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다." + postId));
+                .orElseThrow(PostNotFoundException::new);
 
         Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
-        Page<Comment> commentPage =  commentRepository.findByPost(post, pageDetails);
+        Page<Comment> commentPage = commentRepository.findByPost(post, pageDetails);
         List<Comment> comments = commentPage.getContent();
 
         return PageResponse.of(commentPage, commentMapper.toResponseList(comments));
