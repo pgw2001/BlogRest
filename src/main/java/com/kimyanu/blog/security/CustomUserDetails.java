@@ -27,13 +27,6 @@ public class CustomUserDetails implements UserDetails {
         this.role = member.getRole();
     }
 
-    public CustomUserDetails(Long memberId, String email, MemberRole role) {
-        this.memberId = memberId;
-        this.email = email;
-        this.password = null;
-        this.role = role;
-    }
-
     @Override
     @NullMarked
     public Collection<? extends GrantedAuthority> getAuthorities() {

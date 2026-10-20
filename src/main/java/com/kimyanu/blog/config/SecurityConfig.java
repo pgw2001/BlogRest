@@ -1,5 +1,6 @@
 package com.kimyanu.blog.config;
 
+import com.kimyanu.blog.repository.MemberRepository;
 import com.kimyanu.blog.security.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +26,8 @@ public class SecurityConfig {
             HttpSecurity http,
             CustomAuthenticationEntryPoint authenticationEntryPoint,
             CustomAccessDeniedHandler accessDeniedHandler,
-            JwtProvider jwtProvider) throws Exception {
+            JwtProvider jwtProvider,
+            MemberRepository memberRepository) throws Exception {
         http
                 // URL 기반의 권한 설정
                 // .requestMatchers() : 특정 URL 패턴에 대한 권한 설정
@@ -65,7 +67,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 // .addFilterBefore(filter, targetFilterClass) : 특정 필터를 다른 필터 앞에 추가
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, memberRepository), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

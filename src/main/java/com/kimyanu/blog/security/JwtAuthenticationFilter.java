@@ -1,6 +1,7 @@
 package com.kimyanu.blog.security;
 
-import com.kimyanu.blog.enums.MemberRole;
+import com.kimyanu.blog.model.Member;
+import com.kimyanu.blog.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -24,9 +25,10 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
+    private final MemberRepository memberRepository;
 
-    private static UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(Long memberId, String email, MemberRole role) {
-        CustomUserDetails userDetails = new CustomUserDetails(memberId, email, role);
+    private static UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(Member member) {
+        CustomUserDetails userDetails = new CustomUserDetails(member);
 
         // 6. 인증된 사용자라는 Authentication 객체를 생성한다.
         // - 첫 번째 인자: 인증된 사용자 정보(CustomUserDetails)
@@ -62,18 +64,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 3. 토큰을 검증하고 내용을 꺼낸다.
                 Claims claims = jwtProvider.parseToken(token);
 
-                // 4. 토큰의 subject와 claims에서 필요한 정보를 꺼낸다.
+                // 4. 토큰의 회원 번호로 DB에서 회원을 찾는다.
+                //    토큰은 발급된 뒤에 취소할 수 없어서, 탈퇴한 회원의 토큰도 만료될 때까지 서명 확인을 통과한다.
+                //    요청마다 회원이 아직 있는지 확인해서 탈퇴한 회원의 토큰을 막는다.
                 Long memberId = Long.valueOf(claims.getSubject());
-                String email = claims.get("email", String.class);
-                MemberRole role = MemberRole.valueOf(claims.get("role", String.class));
+                Member member = memberRepository.findByIdAndDeletedAtIsNull(memberId).orElse(null);
 
-                // 5. 토큰에 들어있는 정보로 스프링 시큐리티가 인증 관리에서 사용할 CustomUserDetails 객체를 생성한다.
-                // (DB를 조회하지 않고, 토큰에 들어있는 정보만으로 인증 정보를 만든다.)
-                UsernamePasswordAuthenticationToken authentication = getUsernamePasswordAuthenticationToken(memberId, email, role);
+                if (member != null) {
+                    // 5. 찾은 회원으로 인증된 Authentication 객체를 생성한다.
+                    UsernamePasswordAuthenticationToken authentication = getUsernamePasswordAuthenticationToken(member);
 
-                // 7. 스프링 시큐리티 컨텍스트(전역 저장소)에 인증 정보를 저장한다.
-                // 여기에 인증 객체가 등록되어져 있어야 "이 요청은 로그인된 사용자의 요청이구나"라고 판단할 수 있다.
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    // 6. 인증 정보를 스프링 시큐리티 컨텍스트에 저장한다.
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+
             } catch (JwtException | IllegalArgumentException e) {
                 // 8. 토큰이 유효하지 않으면 인증 정보를 지운다.
                 // 이후의 필터에서 인증되지 않은 상태로 처리된다.
