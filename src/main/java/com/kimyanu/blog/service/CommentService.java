@@ -71,10 +71,10 @@ public class CommentService{
     @Transactional
     public CommentResponse createComment(Long memberId, Long postId, CommentRequest commentRequest) {
 
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findByIdAndIsVisibleTrue(postId)
                 .orElseThrow(PostNotFoundException::new);
 
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndDeletedAtIsNull(memberId)
                 .orElseThrow(MemberNotFoundException::new);
 
         Comment comment = commentMapper.toEntity(commentRequest);
