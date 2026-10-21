@@ -1,5 +1,6 @@
 package com.kimyanu.blog.service;
 
+import com.kimyanu.blog.dto.likes.LikesResponse;
 import com.kimyanu.blog.exceptions.custom.DuplicateLikesException;
 import com.kimyanu.blog.exceptions.custom.LikesNotFoundException;
 import com.kimyanu.blog.exceptions.custom.MemberNotFoundException;
@@ -24,7 +25,7 @@ public class LikesService{
     private final PostRepository postRepository;
 
     @Transactional
-    public void createLike(Long memberId, Long postId) {
+    public LikesResponse createLike(Long memberId, Long postId) {
 
 
         Post post = postRepository.findByIdAndIsVisibleTrue(postId)
@@ -42,14 +43,26 @@ public class LikesService{
         likes.setPost(post);
 
         likesRepository.save(likes);
+
+        LikesResponse response = new LikesResponse();
+        response.setLikesCount(likesRepository.countByPostId(postId));
+        response.setLiked(true);
+
+        return response;
     }
 
     @Transactional
-    public void deleteLike(Long memberId, Long postId) {
+    public LikesResponse deleteLike(Long memberId, Long postId) {
 
         Likes likes = likesRepository.findByPostIdAndMemberId(postId, memberId)
                         .orElseThrow(LikesNotFoundException::new);
 
         likesRepository.delete(likes);
+
+        LikesResponse response = new LikesResponse();
+        response.setLikesCount(likesRepository.countByPostId(postId));
+        response.setLiked(false);
+
+        return response;
     }
 }
