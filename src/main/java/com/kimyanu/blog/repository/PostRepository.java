@@ -37,6 +37,4 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findByMemberId(Long memberId, Pageable pageDetails);
 
     Optional<Post> findByIdAndIsVisibleTrue(Long postId);
-
-    Optional<PostInjection> findProjectionById(long postId);
 }

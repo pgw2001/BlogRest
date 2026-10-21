@@ -10,7 +10,6 @@ import com.kimyanu.blog.security.CustomUserDetails;
 import com.kimyanu.blog.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
@@ -105,14 +104,6 @@ public class PostController {
         postService.deletePost(userDetails.getMemberId(), postId);
 
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/public/posts/test")
-    public ResponseEntity<Void> test() {
-
-        postService.test();
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 

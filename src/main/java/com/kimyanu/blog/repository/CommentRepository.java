@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
@@ -20,4 +22,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     void deleteAllByPostId(@Param("postId") Long postId);
 
     Long countByPostId(Long postId);
+
+    @Query("select c.post.id as postId, count(c) as total from Comment c where c.post.id in :postIds group by c.post.id")
+    List<PostCount> countByPostIds(@Param("postIds") List<Long> postIds);
 }

@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,12 +39,18 @@ public class PostService{
     private final CommentRepository commentRepository;
     private final LikesRepository likesRepository;
 
+    // select ... from post - 1건
+    // select count(...) from post ... - 1건
+    // select count(...) from comment where post_id = ? - 1건
+    // select count(...) from likes where post_id = ? - 1건
+    // 게시글이 10개, 2건 + (1건 * 2) * 10 = 22건 -> 2N + 2
+    // 에서 프로젝션 써서 4건으로 줄임
     public PageResponse<PostResponse> getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
         Page<Post> postPage = postRepository.findByIsVisibleTrue(pageDetails);
         List<Post> posts = postPage.getContent();
 
-        return PageResponse.of(postPage, posts.stream().map(this::toResponseWithCounts).toList());
+        return PageResponse.of(postPage, toResponseListWithCounts(posts));
     }
 
     public PageResponse<PostResponse> getAllPostsForAdmin(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
@@ -50,7 +58,7 @@ public class PostService{
         Page<Post> postPage = postRepository.findAllBy(pageDetails);
         List<Post> posts = postPage.getContent();
 
-        return PageResponse.of(postPage, posts.stream().map(this::toResponseWithCounts).toList());
+        return PageResponse.of(postPage, toResponseListWithCounts(posts));
     }
 
     // 감춘 글이어도 작성자 본인이나 관리자는 볼 수 있다.
@@ -61,7 +69,7 @@ public class PostService{
         Page<Post> postPage = postRepository.findByMemberId(memberId, pageDetails);
         List<Post> posts = postPage.getContent();
 
-        return PageResponse.of(postPage, posts.stream().map(this::toResponseWithCounts).toList());
+        return PageResponse.of(postPage, toResponseListWithCounts(posts));
     }
     public PostResponse getPostById(Long memberId, Long postId, MemberRole role) {
 
@@ -81,7 +89,7 @@ public class PostService{
     @Transactional
     public PostResponse createPost(PostRequest postRequest, Long memberId) {
 
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndDeletedAtIsNull(memberId)
                 .orElseThrow(MemberNotFoundException::new);
 
         Category category = categoryRepository.findById(postRequest.getCategoryId())
@@ -117,7 +125,7 @@ public class PostService{
     @Transactional
     public PostResponse updatePostVisibility(Long postId, PostVisibilityRequest postVisibilityRequest) {
 
-        Post existingPost = postRepository.findById(postId)
+        Post existingPost = postRepository.findWithMemberAndCategoryById(postId)
                 .orElseThrow(PostNotFoundException::new);
 
 
@@ -162,12 +170,36 @@ public class PostService{
         return response;
     }
 
-    public void test() {
-        // I/O 및 대역폭이 감소
-        // I/O, 컴퓨터 시스템이나 데이터베이스가 데이터를 읽어들이고(input) 내보내는(output) 모든 과정
-        // API는 네트워크를 통해 주고 받습니다.
-        
-        // 프로젝션(Projection) : 필요한 컬럼만 조회하는 것
-        postRepository.findProjectionById(1L).orElseThrow(PostNotFoundException::new);
+    // postId | total
+    // 1      | 3
+    // 2      | 5
+    private Map<Long, Long> toCountMap(List<PostCount> counts) {
+        return counts.stream().collect(Collectors.toMap(PostCount::getPostId, PostCount::getTotal));
+    }
+
+    private List<PostResponse> toResponseListWithCounts(List<Post> posts) {
+        List<PostResponse> responses = postMapper.toResponseList(posts);
+        if(responses.isEmpty()) {
+            return responses;
+        }
+
+        // SELECT POST_ID, COUNT(ID) FROM COMMENT WHERE POST_ID IN (1, 2, 3) GROUP BY POST_ID;
+        List<Long> postIds = responses.stream().map(PostResponse::getId).toList();
+
+        // <키, 값> = <게시글 번호, 댓글 수>
+        // <1, 3>, <2, 5>, <3, 0>
+        Map<Long, Long> commentCounts = toCountMap(commentRepository.countByPostIds(postIds));
+
+        // <키, 값> = <게시글 번호, 좋아요 수>
+        // <1, 3>, <2, 5>, <3, 0>
+        Map<Long, Long> likesCounts = toCountMap(likesRepository.countByPostIds(postIds));
+
+        // 결과에 없는 게시글은 댓글이나 좋아요가 없는 것이다
+        // Map.getOrDefault(key, defaultValue) : key에 해당하는 값이 있으면 그 값을 반환하고, 없으면 defaultValue를 반환한다.
+        for (PostResponse response : responses) {
+            response.setCommentCount(commentCounts.getOrDefault(response.getId(), 0L));
+            response.setLikesCount(likesCounts.getOrDefault(response.getId(), 0L));
+        }
+        return responses;
     }
 }
