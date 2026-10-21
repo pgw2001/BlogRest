@@ -37,7 +37,4 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findByMemberId(Long memberId, Pageable pageDetails);
 
     Optional<Post> findByIdAndIsVisibleTrue(Long postId);
-
-    @EntityGraph(attributePaths = {"member", "category"})
-    Optional<Post> findWithMemberAndCategoryByIdAndIsVisibleTrue(Long id);
 }

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@JsonPropertyOrder({"id", "title", "content", "thumbnail", "isVisible", "createdAt"})
+@JsonPropertyOrder({"id", "title", "content", "thumbnail", "isVisible", "createdAt", "authorId", "authorNickname", "categoryId", "categoryName", "commentCount", "likesCount"})
 public class PostResponse {
     private Long id;
     private String title;
@@ -21,4 +21,7 @@ public class PostResponse {
     private String authorNickname;
     private Long categoryId;
     private String categoryName;
+
+    private Long commentCount;
+    private Long likesCount;
 }

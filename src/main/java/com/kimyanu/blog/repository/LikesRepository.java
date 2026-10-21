@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,10 +18,6 @@ public interface LikesRepository extends JpaRepository<Likes, Long> {
     Optional<Likes> findByPostIdAndMemberId(Long postId, Long memberId);
 
     Long countByPostId(Long postId);
-
-    Likes findByPostId(Long postId);
-
-    List<Likes> findAllByPostId(Long postId);
 
     @Modifying
     @Query("delete from Likes l where l.post.id = :postId")

@@ -14,6 +14,7 @@ public interface MemberMapper {
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "deletedAt", ignore = true)
+    @Mapping(target = "tokenInvalidBefore", ignore = true)
     Member toEntity(MemberCreateRequest memberCreateRequest);
 
     MemberResponse toResponse(Member savedMember);
