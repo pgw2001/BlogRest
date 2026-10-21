@@ -25,6 +25,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PostService{
 
     private final List<String> SORTABLE_FIELDS = List.of("id", "title", "content", "createdAt");
@@ -54,6 +55,14 @@ public class PostService{
 
     // 감춘 글이어도 작성자 본인이나 관리자는 볼 수 있다.
 
+    public PageResponse<PostResponse> getMyPosts(Long memberId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+
+        Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_MY_FIELDS);
+        Page<Post> postPage = postRepository.findByMemberId(memberId, pageDetails);
+        List<Post> posts = postPage.getContent();
+
+        return PageResponse.of(postPage, posts.stream().map(this::toResponseWithCounts).toList());
+    }
     public PostResponse getPostById(Long memberId, Long postId, MemberRole role) {
 
         Post post = postRepository.findWithMemberAndCategoryById(postId)
@@ -67,14 +76,6 @@ public class PostService{
         }
 
         return toResponseWithCounts(post);
-    }
-    public PageResponse<PostResponse> getMyPosts(Long memberId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
-
-        Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_MY_FIELDS);
-        Page<Post> postPage = postRepository.findByMemberId(memberId, pageDetails);
-        List<Post> posts = postPage.getContent();
-
-        return PageResponse.of(postPage, posts.stream().map(this::toResponseWithCounts).toList());
     }
 
     @Transactional
@@ -159,5 +160,14 @@ public class PostService{
         response.setLikesCount(likesRepository.countByPostId(post.getId()));
 
         return response;
+    }
+
+    public void test() {
+        // I/O 및 대역폭이 감소
+        // I/O, 컴퓨터 시스템이나 데이터베이스가 데이터를 읽어들이고(input) 내보내는(output) 모든 과정
+        // API는 네트워크를 통해 주고 받습니다.
+        
+        // 프로젝션(Projection) : 필요한 컬럼만 조회하는 것
+        postRepository.findProjectionById(1L).orElseThrow(PostNotFoundException::new);
     }
 }
