@@ -75,7 +75,9 @@ public class AuthController {
         // 로그아웃 시, 토큰 무효화 처리
         authService.logout(memberId);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.expire().toString())
+                .build();
     }
 
 }
