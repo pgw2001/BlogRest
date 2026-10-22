@@ -4,9 +4,13 @@ import com.kimyanu.blog.dto.auth.LoginRequest;
 import com.kimyanu.blog.dto.auth.LoginResponse;
 import com.kimyanu.blog.security.CustomUserDetails;
 import com.kimyanu.blog.security.JwtProvider;
+import com.kimyanu.blog.security.RefreshTokenCookie;
 import com.kimyanu.blog.service.AuthService;
+import com.kimyanu.blog.service.RefreshTokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,6 +31,8 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final AuthService authService;
+    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenCookie refreshTokenCookie;
 
     @PostMapping("/public/auth/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
@@ -45,15 +51,20 @@ public class AuthController {
                 )
         );
 
+        // 인증된 결과에서 회원 정보를 꺼낸다.
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        // 회원 정보로 액세스 토큰을 만든다.
         String token = jwtProvider.createToken(Objects.requireNonNull(userDetails));
 
-//         Member member = memberRepository.findByEmail(loginRequest.getEmail())
-//                  .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
-//         PasswordEncoder.matches(loginReqeust.getPassword(), member.getPassword());
-        // 로그인 성공!
+        // 리프레시 토큰을 만든다.
+        String refreshToken = refreshTokenService.issued(userDetails.getMemberId());
+        ResponseCookie cookie = refreshTokenCookie.create(refreshToken);
 
-        return ResponseEntity.ok(new LoginResponse(token, "Bearer"));
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new LoginResponse(token, "Bearer"));
     }
 
     @PostMapping("/auth/logout")
