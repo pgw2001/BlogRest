@@ -1,6 +1,5 @@
 package com.kimyanu.blog.exceptions;
 
-import com.kimyanu.blog.controller.InvalidRefreshTokenException;
 import com.kimyanu.blog.exceptions.custom.*;
 import com.kimyanu.blog.security.RefreshTokenCookie;
 import lombok.RequiredArgsConstructor;

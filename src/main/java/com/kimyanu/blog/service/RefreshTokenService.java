@@ -1,7 +1,7 @@
 package com.kimyanu.blog.service;
 
-import com.kimyanu.blog.controller.InvalidRefreshTokenException;
 import com.kimyanu.blog.dto.auth.RefreshResult;
+import com.kimyanu.blog.exceptions.custom.InvalidRefreshTokenException;
 import com.kimyanu.blog.model.Member;
 import com.kimyanu.blog.model.RefreshToken;
 import com.kimyanu.blog.repository.MemberRepository;

@@ -1,4 +1,4 @@
-package com.kimyanu.blog.controller;
+package com.kimyanu.blog.exceptions.custom;
 
 public class InvalidRefreshTokenException extends RuntimeException {
     public InvalidRefreshTokenException() {
