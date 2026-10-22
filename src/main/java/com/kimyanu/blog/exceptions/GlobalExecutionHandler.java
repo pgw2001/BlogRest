@@ -1,8 +1,12 @@
 package com.kimyanu.blog.exceptions;
 
+import com.kimyanu.blog.controller.InvalidRefreshTokenException;
 import com.kimyanu.blog.exceptions.custom.*;
+import com.kimyanu.blog.security.RefreshTokenCookie;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.LazyInitializationException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -18,8 +22,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExecutionHandler {
 
+    private final RefreshTokenCookie refreshTokenCookie;
 
     // [커스텀] 404 카테고리 없음
     // 없는 카테고리를 수정 및 삭제하거나, 게시글을 등록 및 수정할 떄 없는 CategoryId를 보내면 던진다.
@@ -96,6 +102,15 @@ public class GlobalExecutionHandler {
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+    }
+
+    // [커스텀] 401 잘못된 리프레시 토큰
+    // 리프레시 토큰이 없으면 던진다. (쿠키에 refreshToken이 없거나, 서버에 저장된 리프레시 토큰과 다르거나, 만료되었거나)
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRefreshTokenException(InvalidRefreshTokenException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.expire().toString())
+                .body(new ErrorResponse(e.getMessage()));
     }
 
     // [스프링] 409 DB 제약 조건 위반

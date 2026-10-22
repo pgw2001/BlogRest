@@ -2,6 +2,7 @@ package com.kimyanu.blog.controller;
 
 import com.kimyanu.blog.dto.auth.LoginRequest;
 import com.kimyanu.blog.dto.auth.LoginResponse;
+import com.kimyanu.blog.dto.auth.RefreshResult;
 import com.kimyanu.blog.security.CustomUserDetails;
 import com.kimyanu.blog.security.JwtProvider;
 import com.kimyanu.blog.security.RefreshTokenCookie;
@@ -16,10 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
@@ -78,6 +76,23 @@ public class AuthController {
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.expire().toString())
                 .build();
+    }
+
+    @PostMapping("/auth/refresh")
+    public ResponseEntity<LoginResponse> refreshToken(
+            @CookieValue(value = RefreshTokenCookie.NAME , required = false) String refreshToken
+    ) {
+        if (refreshToken == null) {
+            throw new InvalidRefreshTokenException();
+        }
+
+        // 리프레시 토큰을 검증하고 새로운 액세스 토큰을 발급한다.
+        RefreshResult result = refreshTokenService.refresh(refreshToken);
+        String token = jwtProvider.createToken(result.userDetails());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.create(result.refreshToken()).toString())
+                .body(new LoginResponse(token, "Bearer"));
     }
 
 }

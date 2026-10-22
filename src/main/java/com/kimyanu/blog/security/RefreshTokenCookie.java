@@ -8,7 +8,7 @@ import java.time.Duration;
 
 @Component
 public class RefreshTokenCookie {
-    private static final String NAME = "refreshToken";
+    public static final String NAME = "refreshToken";
     private static final String PATH = "/api/auth/refresh";
 
     private final Long refreshExpirationMillis;
