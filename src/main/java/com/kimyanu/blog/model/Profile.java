@@ -20,9 +20,9 @@ public class Profile {
     @Column(length = 500)
     private String bio;
 
-    @Column(name = "profile_image", length = 255)
+    @Column(name = "profile_image")
     private String profileImage;
 
-    @Column(name = "sns_link", length = 255)
+    @Column(name = "sns_link")
     private String snsLink;
 }
