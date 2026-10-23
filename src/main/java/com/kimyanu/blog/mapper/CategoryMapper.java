@@ -17,5 +17,6 @@ public interface CategoryMapper {
     // Entity -> DTO
     List<CategoryResponse> toResponseList(List<Category> categories);
 
+    @Mapping(target = "postCount", ignore = true)
     CategoryResponse toResponse(Category savedCategory);
 }

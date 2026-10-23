@@ -8,6 +8,7 @@ import com.kimyanu.blog.exceptions.custom.DuplicateCategoryException;
 import com.kimyanu.blog.mapper.CategoryMapper;
 import com.kimyanu.blog.model.Category;
 import com.kimyanu.blog.repository.CategoryRepository;
+import com.kimyanu.blog.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +34,7 @@ public class CategoryService {
     private static final List<String> SORTABLE_FIELDS = List.of("id", "name");
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+    private final PostRepository postRepository;
 
     public PageResponse<CategoryResponse> getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
@@ -45,7 +47,9 @@ public class CategoryService {
         List<Category> categories =  categoryPage.getContent();
 
         // 엔티티를 DTO로 변환하여 반환 (Entity -> DTO)
-        return PageResponse.of(categoryPage, categoryMapper.toResponseList(categories));
+        List<CategoryResponse> responses = categoryMapper.toResponseList(categories);
+        responses.forEach(r -> r.setPostCount(postRepository.countByCategoryId(r.getId())));
+        return PageResponse.of(categoryPage, responses);
     }
 
     @Transactional
