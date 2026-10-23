@@ -84,7 +84,10 @@ public class PostService{
             throw new PostNotFoundException();
         }
 
-        return toResponseWithCounts(post);
+        PostResponse response = toResponseWithCounts(post);
+        // 로그인한 사람이 이 글에 좋아요를 눌렀는지. 비로그인은 false
+        response.setIsLiked(memberId != null && likesRepository.findByPostIdAndMemberId(postId, memberId).isPresent());
+        return response;
     }
 
     @Transactional
