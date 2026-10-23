@@ -1,15 +1,18 @@
 package com.kimyanu.blog.security;
 
 import com.kimyanu.blog.dto.auth.GoogleUserInfo;
+import com.kimyanu.blog.dto.auth.LoginResponse;
 import com.kimyanu.blog.enums.AuthProvider;
 import com.kimyanu.blog.exceptions.ErrorResponse;
 import com.kimyanu.blog.model.Member;
+import com.kimyanu.blog.service.RefreshTokenService;
 import com.kimyanu.blog.service.SocialAccountService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -19,8 +22,6 @@ import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
 
 @Component
@@ -30,6 +31,9 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectMapper objectMapper;
     private final SocialAccountService socialAccountService;
+    private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenCookie refreshTokenCookie;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -58,17 +62,15 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         // 구글이 확인해준 값으로 우리 회원을 직접 찾거나 만듦
         Member member = socialAccountService.loginOrRegister(AuthProvider.GOOGLE, googleUserInfo);
+        String token = jwtProvider.createToken(new CustomUserDetails(member));
+        String refreshToken = refreshTokenService.issued(member.getId());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.create(refreshToken).toString());
 
-        Map<String, Object> result = new LinkedHashMap<>();
-        result.put("memberId", member.getId());
-        result.put("email", member.getEmail());
-        result.put("nickname", member.getNickname());
-
-        writeJson(response, HttpStatus.OK, googleUserInfo);
+        writeJson(response, HttpStatus.OK, new LoginResponse(token, "Bearer"));
     }
 
     private void writeJson(HttpServletResponse response, HttpStatus httpStatus, Object body) throws IOException {
-        response.setStatus(HttpStatus.OK.value());
+        response.setStatus(httpStatus.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
         objectMapper.writeValue(response.getWriter(), body);
