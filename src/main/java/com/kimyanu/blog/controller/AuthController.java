@@ -3,15 +3,19 @@ package com.kimyanu.blog.controller;
 import com.kimyanu.blog.dto.auth.LoginRequest;
 import com.kimyanu.blog.dto.auth.LoginResponse;
 import com.kimyanu.blog.dto.auth.RefreshResult;
+import com.kimyanu.blog.dto.member.MemberCreateRequest;
 import com.kimyanu.blog.exceptions.custom.InvalidRefreshTokenException;
+import com.kimyanu.blog.model.Member;
 import com.kimyanu.blog.security.CustomUserDetails;
 import com.kimyanu.blog.security.JwtProvider;
 import com.kimyanu.blog.security.RefreshTokenCookie;
 import com.kimyanu.blog.service.AuthService;
+import com.kimyanu.blog.service.MemberService;
 import com.kimyanu.blog.service.RefreshTokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,6 +36,7 @@ public class AuthController {
     private final AuthService authService;
     private final RefreshTokenService refreshTokenService;
     private final RefreshTokenCookie refreshTokenCookie;
+    private final MemberService memberService;
 
     @PostMapping("/public/auth/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
@@ -77,6 +82,18 @@ public class AuthController {
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.expire().toString())
                 .build();
+    }
+
+    @PostMapping("/public/auth/signup")
+    public ResponseEntity<LoginResponse> createMember(@Valid @RequestBody MemberCreateRequest memberCreateRequest){
+        Member member = memberService.createMember(memberCreateRequest);
+
+        String token = jwtProvider.createToken(new CustomUserDetails(member));
+        String refreshToken = refreshTokenService.issued(member.getId());
+        ResponseCookie cookie = refreshTokenCookie.create(refreshToken);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new LoginResponse(token, "Bearer"));
     }
 
     @PostMapping("/public/auth/refresh")

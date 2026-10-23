@@ -85,7 +85,7 @@ public class MemberService{
     }
 
     @Transactional
-    public void createMember(MemberCreateRequest memberCreateRequest) {
+    public Member createMember(MemberCreateRequest memberCreateRequest) {
 
         ensureNotReservedNickname(memberCreateRequest.getNickname());
         ensureNotReservedEmail(memberCreateRequest.getEmail());
@@ -101,7 +101,8 @@ public class MemberService{
         Member memberEntity = memberMapper.toEntity(memberCreateRequest);
         memberEntity.setRole(MemberRole.USER);
         memberEntity.setPassword(passwordEncoder.encode(memberCreateRequest.getPassword()));
-        memberRepository.save(memberEntity);
+
+        return memberRepository.save(memberEntity);
     }
 
     @Transactional

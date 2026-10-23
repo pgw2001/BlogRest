@@ -7,7 +7,6 @@ import com.kimyanu.blog.security.CustomUserDetails;
 import com.kimyanu.blog.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -42,12 +41,6 @@ public class MemberController {
         MemberMeResponse response = memberService.getCurrentMember(userDetails.getMemberId());
 
         return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/public/members")
-    public ResponseEntity<Void> createMember(@Valid @RequestBody MemberCreateRequest memberCreateRequest) {
-        memberService.createMember(memberCreateRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/members/me")

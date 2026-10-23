@@ -31,7 +31,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     public OAuth2SuccessHandler(SocialAccountService socialAccountService,
                                 RefreshTokenService refreshTokenService,
                                 RefreshTokenCookie refreshTokenCookie,
-                                @Value("{$app.frontend-url}")String frontendUrl) {
+                                @Value("${app.frontend-url}")String frontendUrl) {
         this.socialAccountService = socialAccountService;
         this.refreshTokenService = refreshTokenService;
         this.refreshTokenCookie = refreshTokenCookie;

@@ -11,13 +11,13 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonPropertyOrder({"content", "pageNumber", "pageSize", "totalElements", "totalPage", "LastPage"})
+@JsonPropertyOrder({"content", "pageNumber", "pageSize", "totalElements", "totalPages", "LastPage"})
 public class PageResponse<T> {
     private List<T> content;
     private Integer pageNumber;
     private Integer pageSize;
     private Long totalElements;
-    private Integer totalPage;
+    private Integer totalPages;
     private Boolean LastPage;
 
     public static <T> PageResponse<T> of(Page<?> page, List<T> content) {
