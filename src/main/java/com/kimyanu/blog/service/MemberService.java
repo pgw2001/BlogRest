@@ -10,6 +10,7 @@ import com.kimyanu.blog.mapper.MemberMapper;
 import com.kimyanu.blog.model.Member;
 import com.kimyanu.blog.repository.MemberRepository;
 import com.kimyanu.blog.repository.PostRepository;
+import com.kimyanu.blog.repository.SocialAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
@@ -36,6 +37,7 @@ public class MemberService{
     private final MemberMapper memberMapper;
     private final PasswordEncoder passwordEncoder;
     private final PostRepository postRepository;
+    private final SocialAccountRepository socialAccountRepository;
 
     @Transactional(readOnly = true)
     public PageResponse<MemberResponse> getAllMembers(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
@@ -141,6 +143,8 @@ public class MemberService{
 
         // 게시글은 삭제하지는 않지만, 모두 비공개 처리한다.
         postRepository.hideAllByMemberId(memberId);
+
+        socialAccountRepository.deleteByMemberId(memberId);
 
         member.setPassword(null);
     }

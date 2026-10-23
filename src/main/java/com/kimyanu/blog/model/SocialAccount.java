@@ -1,5 +1,6 @@
 package com.kimyanu.blog.model;
 
+import com.kimyanu.blog.enums.AuthProvider;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +21,8 @@ public class SocialAccount {
     private Member member;
 
     @Column(nullable = false)
-    private String provider;
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider;
 
     @Column(name = "provider_id", nullable = false)
     private String providerId;

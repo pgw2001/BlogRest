@@ -27,7 +27,8 @@ public class SecurityConfig {
             CustomAuthenticationEntryPoint authenticationEntryPoint,
             CustomAccessDeniedHandler accessDeniedHandler,
             JwtProvider jwtProvider,
-            MemberRepository memberRepository) throws Exception {
+            MemberRepository memberRepository,
+            OAuth2SuccessHandler oAuth2SuccessHandler) throws Exception {
         http
                 // URL 기반의 권한 설정
                 // .requestMatchers() : 특정 URL 패턴에 대한 권한 설정
@@ -67,7 +68,14 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 // .addFilterBefore(filter, targetFilterClass) : 특정 필터를 다른 필터 앞에 추가
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, memberRepository), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, memberRepository), UsernamePasswordAuthenticationFilter.class)
+                // 소셜 로그인 기능을 활성화하는 설정
+                // oauth2Login() : OAuth2 로그인 기능을 활성화하는 설정
+                // successHandler() : 로그인 성공 시 실행되는 핸들러를 설정
+                // 브라우저로 http://localhost:8080/oauth2/authorization/google 을 호출하면 구글 로그인 화면으로 이동한다.
+                // 구글 로그인 화면에서 로그인하면 구글이 우리 서버의 /login/oauth2/code/google 로 콜백을 보낸다.
+                // 스프링 시큐리티가 구글 로그인 화면
+                .oauth2Login(oauth2 -> oauth2.successHandler(oAuth2SuccessHandler));
 
         return http.build();
     }
