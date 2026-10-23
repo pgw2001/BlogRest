@@ -24,12 +24,14 @@ public class PostController {
 
     @GetMapping("/public/posts")
     public ResponseEntity<PageResponse<PostResponse>> getAllPosts(
+            @RequestParam (value = "categoryId", required = false) Long categoryId,
+            @RequestParam (value = "keyword", required = false) String keyword,
             @RequestParam (value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
             @RequestParam (value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam (value = "sortBy", defaultValue = AppConstant.SORT_POST_BY) String sortBy,
             @RequestParam (value = "sortOrder", defaultValue = AppConstant.SORT_POST_ASC) String sortOrder
             ) {
-        PageResponse<PostResponse> posts = postService.getAllPosts(pageNumber, pageSize, sortBy, sortOrder);
+        PageResponse<PostResponse> posts = postService.getAllPosts(categoryId, keyword, pageNumber, pageSize, sortBy, sortOrder);
         return ResponseEntity.ok(posts);
     }
 

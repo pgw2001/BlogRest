@@ -45,9 +45,9 @@ public class PostService{
     // select count(...) from likes where post_id = ? - 1건
     // 게시글이 10개, 2건 + (1건 * 2) * 10 = 22건 -> 2N + 2
     // 에서 프로젝션 써서 4건으로 줄임
-    public PageResponse<PostResponse> getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public PageResponse<PostResponse> getAllPosts(Long categoryId, String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
-        Page<Post> postPage = postRepository.findByIsVisibleTrue(pageDetails);
+        Page<Post> postPage = postRepository.searchVisible(categoryId, keyword, pageDetails);
         List<Post> posts = postPage.getContent();
 
         return PageResponse.of(postPage, toResponseListWithCounts(posts));
