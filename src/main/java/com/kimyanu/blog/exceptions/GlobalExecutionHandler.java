@@ -112,6 +112,21 @@ public class GlobalExecutionHandler {
                 .body(new ErrorResponse(e.getMessage()));
     }
 
+    // [커스텀] 400 잘못된 파일 업로드
+    // 지원하지 않는 형식의 파일이나 크기를 초과하거나 없을 때 던지는 에러
+    @ExceptionHandler(InvalidFileException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidFileException(InvalidFileException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+    }
+
+    // [커스텀] 404 잘못된 파일 경로?
+    @ExceptionHandler(UploadedFileNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUploadedFileNotFoundException(UploadedFileNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+    }
+
+
+
     // [스프링] 409 DB 제약 조건 위반
     // 지정하거나 지울 때 DB의 제약(유니크, 외래 키)에 걸리면 스프링(JPA)이 던진다.
     // - 같은 요청이 동시에 와서 서비스의 중복 검사를 둘 다 통과한 경우, DB에 저장할 때 유니크 제약 조건에 걸리면 스프링이 던진다.

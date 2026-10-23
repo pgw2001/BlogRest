@@ -73,6 +73,7 @@ public class PostService{
     }
     public PostResponse getPostById(Long memberId, Long postId, MemberRole role) {
 
+
         Post post = postRepository.findWithMemberAndCategoryById(postId)
                 .orElseThrow(PostNotFoundException::new);
 

@@ -16,6 +16,7 @@ public class PostResponse {
     private String thumbnail;
     private Boolean isVisible;
     private LocalDateTime createdAt;
+    private Boolean isLiked;
 
     private Long authorId;
     private String authorNickname;

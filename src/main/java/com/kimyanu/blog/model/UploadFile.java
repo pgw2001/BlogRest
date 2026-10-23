@@ -26,7 +26,7 @@ public class UploadFile {
 
     // 파일의 형식(images/png, image/jped, application/pdf 등)
     @Column(nullable = false, length = 50)
-    private Long contentType;
+    private String contentType;
 
     // 파일 크기
     @Column(nullable = false)
@@ -39,7 +39,7 @@ public class UploadFile {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    private Member uploader;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

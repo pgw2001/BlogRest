@@ -29,6 +29,7 @@ public interface PostMapper {
     @Mapping(source = "category.name", target = "categoryName")
     @Mapping(target = "commentCount", ignore = true)
     @Mapping(target = "likesCount", ignore = true)
+    @Mapping(target = "isLiked", ignore = true)
     PostResponse toResponse(Post post);
 
     List<PostResponse> toResponseList(List<Post> posts);
