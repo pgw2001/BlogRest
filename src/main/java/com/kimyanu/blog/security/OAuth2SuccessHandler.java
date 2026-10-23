@@ -1,39 +1,42 @@
 package com.kimyanu.blog.security;
 
 import com.kimyanu.blog.dto.auth.GoogleUserInfo;
-import com.kimyanu.blog.dto.auth.LoginResponse;
 import com.kimyanu.blog.enums.AuthProvider;
-import com.kimyanu.blog.exceptions.ErrorResponse;
 import com.kimyanu.blog.model.Member;
 import com.kimyanu.blog.service.RefreshTokenService;
 import com.kimyanu.blog.service.SocialAccountService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Objects;
 
 @Component
 @NullMarked
-@RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
-    private final ObjectMapper objectMapper;
     private final SocialAccountService socialAccountService;
-    private final JwtProvider jwtProvider;
     private final RefreshTokenService refreshTokenService;
     private final RefreshTokenCookie refreshTokenCookie;
+    private final String frontendUrl;
+
+    public OAuth2SuccessHandler(SocialAccountService socialAccountService,
+                                RefreshTokenService refreshTokenService,
+                                RefreshTokenCookie refreshTokenCookie,
+                                @Value("{$app.frontend-url}")String frontendUrl) {
+        this.socialAccountService = socialAccountService;
+        this.refreshTokenService = refreshTokenService;
+        this.refreshTokenCookie = refreshTokenCookie;
+        this.frontendUrl = frontendUrl;
+    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -56,23 +59,14 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         // 구글이 확인해 준 이메일이 실제로 그 사람의 것인지 확인되지 않았다면 로그인 실패로 처리한다.
         if(!Boolean.TRUE.equals(googleUserInfo.emailVerified())) {
-            writeJson(response, HttpStatus.BAD_REQUEST, new ErrorResponse("이메일 인즈잉 완료되지 않은 계정입니다."));
+            response.sendRedirect(frontendUrl + OAuth2FailureHandler.LOGIN_ERROR_PATH);
             return;
         }
 
         // 구글이 확인해준 값으로 우리 회원을 직접 찾거나 만듦
         Member member = socialAccountService.loginOrRegister(AuthProvider.GOOGLE, googleUserInfo);
-        String token = jwtProvider.createToken(new CustomUserDetails(member));
         String refreshToken = refreshTokenService.issued(member.getId());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.create(refreshToken).toString());
-
-        writeJson(response, HttpStatus.OK, new LoginResponse(token, "Bearer"));
-    }
-
-    private void writeJson(HttpServletResponse response, HttpStatus httpStatus, Object body) throws IOException {
-        response.setStatus(httpStatus.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
-        objectMapper.writeValue(response.getWriter(), body);
+        response.sendRedirect(frontendUrl);
     }
 }
