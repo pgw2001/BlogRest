@@ -1,0 +1,53 @@
+name: Deploy to cloudtype
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Connect deploy key
+        uses: cloudtype-github-actions/connect@v1
+        with:
+          token: ${{ secrets.CLOUDTYPE_TOKEN }}
+          ghtoken: ${{ secrets.GHP_TOKEN }}
+      - name: Deploy
+        uses: cloudtype-github-actions/deploy@v1
+        with:
+          token: ${{ secrets.CLOUDTYPE_TOKEN }}
+          project: pgw2001/aibe
+          stage: main
+          yaml: >
+            name: blogrest
+
+            app: dockerfile
+
+            options:
+              ports: "8080"
+              dockerfile: Dockerfile
+              env:
+                - name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID
+                  value: 737638357244-jvlfchlk7luqcsgtvgls3oia490nctkc.apps.googleusercontent.com
+                - name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET
+                  secret: google
+                - name: JWT_SECRET
+                  secret: JWT_SECRET
+                - name: APP_FRONTEND_URL
+                  value: http://localhost:5173
+                - name: SPRING_PROFILES_ACTIVE
+                  value: prod
+                - name: DB_URL
+                  value: jdbc:mariadb://mariadb:3306/blog
+                - name: DB_USERNAME
+                  value: blog
+                - name: DB_PASSWORD
+                  secret: mariadb-user-password
+              args: []
+            context:
+              git:
+                url: git@github.com:${{ github.repository }}.git
+                ref: ${{ github.ref }}
+              preset: dockerfile
