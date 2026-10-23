@@ -36,7 +36,7 @@ jobs:
                 - name: JWT_SECRET
                   secret: JWT_SECRET
                 - name: APP_FRONTEND_URL
-                  value: http://localhost:5173
+                  value: https://blog-front-lyart.vercel.app
                 - name: SPRING_PROFILES_ACTIVE
                   value: prod
                 - name: DB_URL
