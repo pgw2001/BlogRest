@@ -166,6 +166,12 @@ INSERT INTO likes (id, post_id, member_id, created_at) VALUES (8, 5, 9, CURRENT_
 INSERT INTO likes (id, post_id, member_id, created_at) VALUES (9, 5, 10, CURRENT_TIMESTAMP);
 INSERT INTO likes (id, post_id, member_id, created_at) VALUES (10, 8, 1, CURRENT_TIMESTAMP);
 
+-- 프로필 샘플 데이터
+INSERT INTO profile (id, member_id, bio, profile_image, sns_link) VALUES (1, 1, '백엔드 공부 중입니다. 매일 기록합니다.', NULL, 'https://github.com/kimcoding');
+INSERT INTO profile (id, member_id, bio, profile_image, sns_link) VALUES (2, 2, '자바와 스프링을 좋아합니다.', NULL, NULL);
+INSERT INTO profile (id, member_id, bio, profile_image, sns_link) VALUES (3, 3, '스프링 연습 중입니다.', NULL, NULL);
+
+ALTER TABLE PROFILE ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM PROFILE);
 ALTER TABLE LIKES ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM LIKES);
 ALTER TABLE MEMBER ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM MEMBER);
 ALTER TABLE POST ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM POST);

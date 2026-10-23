@@ -1,15 +1,20 @@
 package com.kimyanu.blog.service;
 
+import com.kimyanu.blog.dto.auth.SocialAccountResponse;
 import com.kimyanu.blog.dto.common.PageResponse;
 import com.kimyanu.blog.dto.member.*;
+import com.kimyanu.blog.dto.profile.ProfileResponse;
 import com.kimyanu.blog.enums.MemberRole;
 import com.kimyanu.blog.exceptions.custom.DuplicateMemberException;
 import com.kimyanu.blog.exceptions.custom.MemberNotFoundException;
 import com.kimyanu.blog.exceptions.custom.ReservedMemberValueException;
 import com.kimyanu.blog.mapper.MemberMapper;
+import com.kimyanu.blog.mapper.ProfileMapper;
 import com.kimyanu.blog.model.Member;
+import com.kimyanu.blog.model.SocialAccount;
 import com.kimyanu.blog.repository.MemberRepository;
 import com.kimyanu.blog.repository.PostRepository;
+import com.kimyanu.blog.repository.ProfileRepository;
 import com.kimyanu.blog.repository.SocialAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
@@ -38,6 +43,8 @@ public class MemberService{
     private final PasswordEncoder passwordEncoder;
     private final PostRepository postRepository;
     private final SocialAccountRepository socialAccountRepository;
+    private final ProfileRepository profileRepository;
+    private final ProfileMapper profileMapper;
 
     @Transactional(readOnly = true)
     public PageResponse<MemberResponse> getAllMembers(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
@@ -60,11 +67,21 @@ public class MemberService{
         return memberMapper.toPublicResponse(member);
     }
 
+    @Transactional(readOnly = true)
     public MemberMeResponse getCurrentMember(Long memberId) {
 
         Member member = findExistingMember(memberId);
 
-        return memberMapper.toMeResponse(member);
+        // 프로필은 가입할 때 만들지 않으므로, 처음 조회할 때 없으면 빈 프로필을 만들어서 반환한다.
+        ProfileResponse profileResponse = profileRepository.findByMemberId(memberId)
+                .map(profileMapper::toResponse)
+                .orElseGet(() -> profileMapper.toEmptyResponse(member));
+
+        // 소셜 계정은 가입할 때 만들므로, 없으면 빈 리스트를 반환한다.
+        List<SocialAccount> socialAccounts = socialAccountRepository.findByMemberIdOrderByIdAsc(memberId);
+        List<SocialAccountResponse> socialAccountResponses = memberMapper.toSocialAccountResponseList(socialAccounts);
+
+        return memberMapper.toMeResponse(member, profileResponse, socialAccountResponses);
     }
 
     @Transactional

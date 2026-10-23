@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,4 +21,6 @@ public interface SocialAccountRepository extends JpaRepository<SocialAccount, Lo
     @Modifying
     @Query("delete from SocialAccount s where s.member.id = :memberid")
     void deleteByMemberId(@Param("memberId") Long memberId);
+
+    List<SocialAccount> findByMemberIdOrderByIdAsc(Long memberId);
 }
