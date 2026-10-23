@@ -14,7 +14,6 @@ public class RefreshTokenCleaner {
     // 0 0 4 * * * // 매일 새벽 4시
     // 0/30 * * * * * : 30초마다 실행
     @Scheduled(cron = "0 0 4 * * *")
-    @Scheduled(fixedRate = 30000)
     public void cleanExpiredTokens() {
         int deletedCount = refreshTokenService.deleteExpired();
         System.out.println("Cleaning expired refresh tokens... Deleted count: " + deletedCount);
