@@ -40,3 +40,5 @@ out/
 ### PostMan ###
 .postman/
 postman/
+
+application-secret.properties
