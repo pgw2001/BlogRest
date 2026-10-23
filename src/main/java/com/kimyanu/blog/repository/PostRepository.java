@@ -44,4 +44,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findByIdAndIsVisibleTrue(Long postId);
 
     Long countByCategoryId(Long categoryId);
+
+    Long countByMemberId(Long memberId);
 }

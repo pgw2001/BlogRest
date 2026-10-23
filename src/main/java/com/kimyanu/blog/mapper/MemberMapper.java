@@ -20,6 +20,7 @@ public interface MemberMapper {
     @Mapping(target = "tokenInvalidBefore", ignore = true)
     Member toEntity(MemberCreateRequest memberCreateRequest);
 
+    @Mapping(target = "postCount", ignore = true)
     MemberResponse toResponse(Member savedMember);
 
     MemberPublicResponse toPublicResponse(Member savedMember);

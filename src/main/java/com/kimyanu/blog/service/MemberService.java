@@ -57,7 +57,10 @@ public class MemberService{
         List<Member> members = memberPage.getContent();
 
 
-        return PageResponse.of(memberPage, memberMapper.toResponseList(members));
+        List<MemberResponse> responses = memberMapper.toResponseList(members);
+        // ponytail: 회원마다 count 쿼리 1번(페이지당 최대 100번). 느려지면 group by 한 번으로 묶는다
+        responses.forEach(r -> r.setPostCount(postRepository.countByMemberId(r.getId())));
+        return PageResponse.of(memberPage, responses);
     }
 
     public MemberPublicResponse getMemberById(Long memberId) {
