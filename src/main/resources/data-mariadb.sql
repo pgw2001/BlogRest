@@ -60,7 +60,6 @@ VALUES (29, '질문답변');
 INSERT IGNORE INTO category (id, name)
 VALUES (30, '공지사항');
 
-ALTER TABLE CATEGORY ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM CATEGORY);
 
 -- 회원 샘플 데이터
 INSERT IGNORE INTO member (id, email, password, nickname, role, created_at)
