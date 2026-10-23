@@ -87,7 +87,7 @@ public class PostController {
         return ResponseEntity.ok(updatedPost);
     }
 
-    @PutMapping("/admin/posts/{postId}/visibility")
+    @PatchMapping("/admin/posts/{postId}/visibility")
     @Transactional
     public ResponseEntity<PostResponse> updatePostVisibility(
             @PathVariable Long postId,
