@@ -52,7 +52,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 // CORS 설정
-                // 프론트엔드 화면(http://localhost:5173)과 서버(http://localhost:8080)는 포트가 달라서
+                // 프론트엔드 화면(http://localhost:5173)과 서버(http://localhost:8080)는 포트가 달라서 다른 출처다.
+                // 브라우저는 다른 출처에 보낸 요청의 응답을 기본적으로 차단한다.
                 .cors(Customizer.withDefaults())
                 // CSRF 보호 기능을 활성화 (<form action="">) 요청에 대해 CSRF 토큰을 검증하도록 설정
                 // 사용자 자신의 의지와 무관하게 공격자가 의도한 수정, 삭제, 등록 등(POST, PUT, DELETE)의 행위를 서버에 수행하게 만드는 공격을 의미

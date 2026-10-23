@@ -79,7 +79,7 @@ public class AuthController {
                 .build();
     }
 
-    @PostMapping("/auth/refresh")
+    @PostMapping("/public/auth/refresh")
     public ResponseEntity<LoginResponse> refreshToken(
             @CookieValue(value = RefreshTokenCookie.NAME , required = false) String refreshToken
     ) {
