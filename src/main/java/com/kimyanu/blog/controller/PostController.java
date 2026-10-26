@@ -8,6 +8,7 @@ import com.kimyanu.blog.dto.post.PostVisibilityRequest;
 import com.kimyanu.blog.enums.MemberRole;
 import com.kimyanu.blog.security.CustomUserDetails;
 import com.kimyanu.blog.service.PostService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ public class PostController {
 
     private final PostService postService;
 
+    @SecurityRequirements
     @GetMapping("/public/posts")
     public ResponseEntity<PageResponse<PostResponse>> getAllPosts(
             @RequestParam (value = "categoryId", required = false) Long categoryId,
